@@ -32,7 +32,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin:0 0 18px;display:flex;align-items:center;gap:10px}
 .eyebrow::before{content:"";width:22px;height:2px;background:var(--accent);display:block}
 .display{font-family:var(--display);font-variation-settings:"wdth" 82,"opsz" 96;font-weight:760;letter-spacing:-.035em;line-height:.93;text-wrap:balance;margin:0}
-
+ 
 /* buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:11px 20px;font-weight:600;font-size:.95rem;text-decoration:none;border:1.5px solid var(--ink);background:transparent;transition:background .25s var(--ease),color .25s var(--ease),transform .25s var(--ease),border-color .25s var(--ease);white-space:nowrap}
 .btn.solid{background:var(--ink);color:#fff}
@@ -41,7 +41,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn:active{transform:scale(.97)}
 .btn[disabled]{opacity:.4;cursor:not-allowed}
 .btn.lg{padding:15px 28px;font-size:1.02rem}
-
+ 
 /* nav */
 .nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
 .nav.scrolled{border-color:var(--line)}
@@ -53,15 +53,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 .nav-r{display:flex;gap:10px}
 @media (max-width:820px){.links{display:none}}
 @media (max-width:520px){#walletBtn{display:none}}
-
+ 
 /* hero */
 .hero{padding-top:clamp(28px,5vw,64px);position:relative}
 .hero h1{font-size:clamp(2.7rem,8.4vw,7.6rem);max-width:15ch}
 .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
 .hero h1 .w>span{display:inline-block;transform:translateY(105%);animation:rise 1s var(--ease) forwards;animation-delay:calc(var(--i)*70ms + 150ms)}
 @keyframes rise{to{transform:none}}
-.hero h1 .hot{color:var(--accent);transition:font-variation-settings .6s var(--ease)}
-.hero h1 .hot:hover{font-variation-settings:"wdth" 100,"opsz" 96}
+.hero h1 .hot{color:var(--accent)}
 .stage-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2fr) minmax(250px,1fr);gap:clamp(12px,2vw,28px);align-items:center;margin-top:clamp(12px,2vw,28px);position:relative}
 .stage-grid::before{content:"";position:absolute;inset:0 -4%;background-image:radial-gradient(var(--line) 1.2px,transparent 1.4px);background-size:22px 22px;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 20%,transparent 75%);pointer-events:none;z-index:0}
 .stage-grid>*{position:relative;z-index:1;min-width:0}
@@ -83,7 +82,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   .copy .lede{max-width:44ch}
   .gl-wrap{height:min(92vw,520px)}
 }
-
+ 
 /* inspector */
 .inspect{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:14px}
 .seg{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
@@ -112,7 +111,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .linkbtn{background:none;border:0;padding:0;font-size:.8rem;color:var(--mute);text-decoration:underline;text-underline-offset:3px}
 .linkbtn:hover{color:var(--ink)}
 .earned{font-size:.8rem;color:var(--ink-2);display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:10px;font-variant-numeric:tabular-nums}
-
+ 
 /* sections */
 .section{padding-top:clamp(72px,11vw,150px);scroll-margin-top:56px}
 .sec-head{margin-bottom:clamp(28px,4vw,56px);max-width:900px}
@@ -124,7 +123,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   }
 }
 @keyframes revealIn{from{opacity:.12;transform:translateY(36px)}to{opacity:1;transform:none}}
-
+ 
 /* how */
 .how-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,72px);align-items:start}
 .steps{list-style:none;margin:0;padding:0;counter-reset:s}
@@ -150,7 +149,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #chart .floor{stroke:var(--mute);stroke-dasharray:3 4;stroke-width:1}
 .readout{font-family:var(--mono);font-size:.78rem;color:var(--ink-2);margin-top:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
 @media (max-width:900px){.how-grid{grid-template-columns:minmax(0,1fr)}.chart-card{position:static}}
-
+ 
 /* launches */
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px}
 .tab{border:0;background:transparent;border-radius:10px;padding:10px 16px;font-weight:500;display:flex;gap:10px;align-items:center;color:var(--ink-2);transition:background .25s,color .25s}
@@ -180,7 +179,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .card .btn{width:100%;padding:11px}
 .empty{grid-column:1/-1;border:1.5px dashed var(--line);border-radius:var(--r-m);padding:48px 24px;text-align:center;color:var(--mute)}
 .note{margin-top:22px;color:var(--mute);font-size:.85rem}
-
+ 
 /* launch form */
 .launch-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:clamp(24px,4vw,56px);align-items:start}
 .form{display:flex;flex-direction:column;gap:0}
@@ -240,7 +239,7 @@ details.social summary span{font-family:var(--mono);font-weight:400;color:var(--
 .preseg span.avail{background:#fff;border:1.5px solid var(--line);color:var(--mute)}
 .est{display:flex;justify-content:space-between;margin-top:12px;font-size:.85rem;color:var(--ink-2)}
 .est b{font-family:var(--mono);font-weight:500;color:var(--ink)}
-
+ 
 .summary{position:sticky;top:90px;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:16px}
 .summary h3{margin:0;font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 36;font-weight:720;font-size:1.35rem;letter-spacing:-.03em}
 .sum-rows{margin:0;display:grid;gap:10px}
@@ -265,7 +264,7 @@ details.social summary span{font-family:var(--mono);font-weight:400;color:var(--
 @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
 @media (max-width:980px){.launch-grid{grid-template-columns:minmax(0,1fr)}.summary{position:static}}
 @media (max-width:620px){.social-grid{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.row2{grid-template-columns:1fr}}
-
+ 
 footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);padding-block:36px 48px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;align-items:center;color:var(--mute);font-size:.88rem}
 /* docs */
 .docs{padding-top:clamp(28px,5vw,72px)}
@@ -336,7 +335,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
   .card,.steps li,.seg button,.venue,.mode{transition:none}
 }
 </style>
-
+ 
 </head>
 <body>
 <header class="nav wrap" id="nav" style="background-color:color-mix(in srgb,#FCFCFB 86%,transparent)">
@@ -350,11 +349,11 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
     <a class="btn solid" href="#launch">Launch a token</a>
   </div>
 </header>
-
+ 
 <main class="wrap" id="top">
   <section class="hero">
     <h1 class="display" id="h1" data-text="Great things happen when ownership is shared.">Great things happen when ownership is shared.</h1>
-
+ 
     <div class="stage-grid">
       <div class="copy">
         <p class="lede">Turn a token’s creator fees into ten Slices. Buy a share. Earn as it trades.</p>
@@ -362,36 +361,29 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
           <a class="btn solid lg" href="#launch">Launch a token</a>
           <a class="btn ghost lg" href="#launches">Find a Slice</a>
         </div>
-        <ul class="legend" aria-label="Slice colors">
-          <li><i class="dot c"></i>Creator</li>
-          <li><i class="dot y"></i>Yours</li>
-          <li><i class="dot o"></i>Open</li>
-        </ul>
       </div>
-
+ 
       <div class="gl-wrap" id="glWrap">
-        <canvas id="gl" aria-label="Ten Slices arranged around a token. Drag to turn, click a Slice to inspect it."></canvas>
+        <canvas id="gl" aria-label="A token split into ten Slices, with its fees flowing into each one. Drag to turn."></canvas>
         <div class="fallback"><span>The 3D view needs WebGL. Pick a Slice from the selector.</span></div>
         <div class="hint mono">Drag to turn · Click a Slice</div>
       </div>
-
+ 
       <aside class="inspect" aria-label="Slice inspector">
-        <div class="mono">Sample auction</div>
+        <div class="mono">How a Slice is priced</div>
         <div class="seg" id="heroSeg" role="group" aria-label="Choose a Slice"></div>
-        <div class="ins-top"><div class="ins-slice"><small>SLICE</small><span id="insLot">04</span></div><span class="pill open" id="insPill">Open</span></div>
-        <div class="price-row"><b id="insPrice">1.500</b><small>SOL</small><span class="mono lab" id="insPriceLab">Price now</span></div>
+        <div class="ins-top"><div class="ins-slice"><small>SLICE</small><span id="insLot">04</span></div><span class="pill open" id="insPill">10% of fees</span></div>
+        <div class="price-row"><b id="insPrice">1.500</b><small>SOL</small><span class="mono lab" id="insPriceLab">Example</span></div>
         <div class="bar" aria-hidden="true"><i id="insBar"></i></div>
         <p class="ins-note" id="insNote"></p>
-        <button class="btn solid" id="insTake" type="button">Take Slice 04</button>
+        <a class="btn solid" id="insTake" href="#launches">See live launches</a>
         <div class="ins-foot">
           <div class="toggle" role="group" aria-label="Auction mode"><button type="button" data-hm="degen" aria-pressed="true">Degen</button><button type="button" data-hm="builder" aria-pressed="false">Builder</button></div>
-          <button class="linkbtn" id="insReset" type="button">Reset</button>
         </div>
-        <div class="earned" id="earned" hidden><span>Sample fees to your Slices</span><b id="earnedV">0.0000 SOL</b></div>
       </aside>
     </div>
   </section>
-
+ 
   <section class="section" id="how">
     <div class="sec-head reveal">
       <p class="eyebrow">How a Slice works</p>
@@ -414,20 +406,20 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
       </figure>
     </div>
   </section>
-
+ 
   <section class="section" id="launches">
     <div class="sec-head reveal"><p class="eyebrow">Browse</p><h2 class="display">Find your next Slice<span style="color:var(--accent)">.</span></h2></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Launch filters"></div>
     <div class="grid" id="grid" role="tabpanel"></div>
-    <p class="note" id="gridNote">These are sample launches for the layout. Prices step down live; taking a Slice resets that card’s auction.</p>
+    <p class="note" id="gridNote">Launches appear here as soon as they go live.</p>
   </section>
-
+ 
   <section class="section" id="mine" hidden>
     <div class="sec-head"><p class="eyebrow">Your Slices</p><h2 class="display">What you’ve earned.</h2><p class="sub">Fees build up in each Slice as the token trades. Collect fees pays out everything the token has earned so far to all ten Slices, then Claim sends your share to your wallet.</p></div>
     <div id="mineList" class="mine-list"></div>
     <p class="note"><button class="linkbtn" id="mineConnect" type="button">Connect wallet</button> to refresh this list.</p>
   </section>
-
+ 
   <section class="section" id="launch">
     <div class="sec-head reveal">
       <p class="eyebrow">Launch</p>
@@ -451,7 +443,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
             </div>
           </fieldset>
         </div>
-
+ 
         <div class="block">
           <h3><span class="n">1</span>Token</h3>
           <div class="row2">
@@ -477,7 +469,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
             </div>
           </details>
         </div>
-
+ 
         <div class="block">
           <h3><span class="n">2</span>Auction mode</h3>
           <div class="modes" role="radiogroup" aria-label="Auction mode">
@@ -491,7 +483,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
             </button>
           </div>
         </div>
-
+ 
         <div class="block">
           <h3><span class="n">3</span>Pre-buy Slices</h3>
           <div class="stepper">
@@ -500,7 +492,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
           </div>
           <div class="preseg" id="preSeg" aria-hidden="true"></div>
         </div>
-
+ 
         <div class="block">
           <h3>Dev buy</h3>
           <div class="field">
@@ -510,9 +502,9 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
           <div class="est"><span>Estimated tokens received</span><b id="devEst">~0 tokens</b></div>
         </div>
       </form>
-
+ 
       <aside class="summary" aria-label="Launch summary">
-        <span class="preview-flag" id="netFlag">Preview build · no transactions sent</span>
+        <span class="preview-flag" id="netFlag">Launching soon</span>
         <h3>Your launch</h3>
         <dl class="sum-rows">
           <div><dt>Venue</dt><dd id="sVenue">Pump</dd></div>
@@ -537,7 +529,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
       </aside>
     </div>
   </section>
-
+ 
   <footer>
     <a class="brand" href="#top" style="font-size:1.3rem"><span>Slice</span></a>
     <span>Ten Slices. One fee stream.</span>
@@ -568,7 +560,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
         <p>Every token earns creator fees as it trades. Slices splits that stream into <strong>ten equal shares</strong> and sells them in a price-falling auction. If you hold a Slice, you earn one tenth of the creator fees for as long as the token trades.</p>
         <p>The creator keeps the choice of how many Slices to hold from day one. Everyone else buys the rest at a price that starts high and steps down until someone takes it.</p>
       </section>
-
+ 
       <section id="docs-slices" data-ds>
         <h2>What a Slice is</h2>
         <p>A Slice is a numbered claim on a share of one token’s creator fees. Every launch has exactly ten, numbered 01 to 10, and each is worth 10% of the same stream.</p>
@@ -580,7 +572,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
           <tr><td>Yours</td><td>Held by your wallet. Fees for this Slice are credited to you.</td></tr>
         </tbody></table>
       </section>
-
+ 
       <section id="docs-auction" data-ds>
         <h2>The auction</h2>
         <p>Open Slices are sold at a price that falls on a fixed schedule. Every 15 seconds the price drops by one step, until it reaches the floor. It stays at the floor until the Slice is taken.</p>
@@ -592,7 +584,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
         </tbody></table></div>
         <p>The creator picks the mode when launching. You can watch both schedules play out on the <a href="#how">chart on the home page</a>.</p>
       </section>
-
+ 
       <section id="docs-take" data-ds>
         <h2>Taking a Slice</h2>
         <p>Taking a Slice is one transaction that you sign in your wallet. It either completes in full or does not happen at all.</p>
@@ -604,7 +596,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
           <li><div><h3>You start earning</h3><p>From the next fees the token earns, one tenth is credited to you for this Slice.</p></div></li>
         </ol>
       </section>
-
+ 
       <section id="docs-fees" data-ds>
         <h2>Earning fees</h2>
         <p>Taking a Slice does not pay you anything by itself. You earn from trading activity that happens afterwards.</p>
@@ -613,7 +605,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
         <p>To get paid, press <strong>Collect fees</strong>: it pays everything the token has earned so far into all ten vaults at once, and anyone can do it. Then <strong>Claim</strong> sends your vault’s balance to your wallet in SOL. Fees earned by a Slice before anyone buys it stay in its vault and go to whoever takes it.</p>
         <p>More trading volume means more fees. A quiet token earns little, and a Slice has no guaranteed return.</p>
       </section>
-
+ 
       <section id="docs-launch" data-ds>
         <h2>Launching a token</h2>
         <p>Creators set the terms on the <a href="#launch">launch form</a> and sign once.</p>
@@ -626,7 +618,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
         </tbody></table>
         <p>The total you sign is <code>2% × pre-buy Slices × floor price + dev buy</code>, plus about 0.04 SOL of network rent for the new accounts. For example, three Degen pre-buys and a 0.2 SOL dev buy come to 0.03 + 0.2 + 0.04 ≈ <strong>0.27 SOL</strong>.</p>
       </section>
-
+ 
       <section id="docs-status" data-ds>
         <h2>Terms</h2>
         <div class="callout"><p><strong>Unaudited software.</strong> The Slices program has not had a security audit yet. Use small amounts, and check the network badge on the launch form before you sign.</p></div>
@@ -640,7 +632,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
         </tbody></table>
         <p>One thing outside Slices’ control: Pump and Meteora can change their own programs and fee rules, including Pump’s admin tools for fee sharing.</p>
       </section>
-
+ 
       <section id="docs-faq" data-ds class="faq">
         <h2>FAQ</h2>
         <details><summary>Can two people take the same Slice?</summary><p>No. Only the first transaction to land wins. The other fails in full and the SOL is not spent.</p></details>
@@ -658,7 +650,7 @@ footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);paddin
   </footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-
+ 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script type="module" src="/src/main.ts"></script>
 <script>
@@ -676,18 +668,18 @@ const MODES = {
 };
 const priceAt = (m, ms) => Math.max(m.floor, +(m.start - m.drop * Math.floor(ms / STEP)).toFixed(4));
 const floorMs = m => Math.round((m.start - m.floor) / m.drop) * STEP;
-
+ 
 /* toast */
 let toastT;
 function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200);
 }
-
+ 
 /* nav border on scroll */
 const nav = $('#nav');
 addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8), { passive: true });
-
+ 
 /* headline split */
 (function () {
   const h = $('#h1'); const words = h.dataset.text.split(' ');
@@ -697,7 +689,7 @@ addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8), 
     return `<span class="w" aria-hidden="true"><span style="--i:${i}"${hot ? ' class="hot"' : ''}>${w}</span></span>`;
   }).join(' ');
 })();
-
+ 
 /* wallet */
 const wallet = { address: null };
 function walletProvider() { return (window.phantom && window.phantom.solana) || window.solana || window.solflare || null; }
@@ -729,15 +721,15 @@ async function connectWallet() {
   } catch (e) { toast('Wallet connection was cancelled.'); return false; }
 }
 $('#walletBtn').addEventListener('click', connectWallet);
-
+ 
 /* ================= HERO STATE ================= */
 const hero = {
   mode: 'degen', t0: performance.now(), sel: 3,
-  owners: ['creator', 'creator', 'creator', null, null, null, null, null, null, null],
+  owners: Array(10).fill(null),
   paid: Array(10).fill(0), earned: 0
 };
 let scene = null;
-
+ 
 const heroSeg = $('#heroSeg');
 for (let i = 0; i < 10; i++) {
   const b = document.createElement('button'); b.type = 'button'; b.textContent = pad(i + 1); b.dataset.i = i;
@@ -750,53 +742,22 @@ function selectLot(i, focus) {
   renderInspector(performance.now());
 }
 function renderInspector(now) {
-  const m = MODES[hero.mode]; const i = hero.sel; const o = hero.owners[i]; const el = now - hero.t0;
+  const m = MODES[hero.mode]; const i = hero.sel; const el = now - hero.t0;
   $$('button', heroSeg).forEach((b, k) => {
-    const ow = hero.owners[k];
-    b.className = (ow || '') + (k === i ? ' sel' : '');
-    b.setAttribute('aria-label', `Slice ${pad(k + 1)}, ${ow === 'creator' ? 'held by creator' : ow === 'you' ? 'yours' : 'open'}`);
+    b.className = k === i ? 'sel' : '';
+    b.setAttribute('aria-label', `Slice ${pad(k + 1)}`);
   });
   $('#insLot').textContent = pad(i + 1);
-  const pill = $('#insPill');
-  pill.className = 'pill ' + (o === 'you' ? 'you' : o ? '' : 'open');
-  pill.textContent = o === 'you' ? 'Yours' : o === 'creator' ? 'Creator' : 'Open';
-  const take = $('#insTake'); const note = $('#insNote'); const bar = $('#insBar');
-  if (!o) {
-    const atFloor = el >= floorMs(m);
-    $('#insPrice').textContent = fmt(priceAt(m, el));
-    $('#insPriceLab').textContent = 'Price now';
-    bar.style.width = (atFloor ? 100 : (el % STEP) / STEP * 100) + '%';
-    note.textContent = atFloor ? `At the floor of ${m.floor} SOL. It stays here until someone takes a Slice.` : `Drops ${m.drop} SOL in ${Math.ceil((STEP - el % STEP) / 1000)}s. Floor is ${m.floor} SOL.`;
-    take.disabled = false; take.textContent = `Take Slice ${pad(i + 1)}`;
-  } else {
-    $('#insPrice').textContent = fmt(o === 'creator' ? m.floor : hero.paid[i]);
-    $('#insPriceLab').textContent = 'Paid';
-    bar.style.width = '100%';
-    note.textContent = o === 'creator' ? 'Pre-bought by the creator at the floor price.' : 'You hold one tenth of this token’s creator fees.';
-    take.disabled = true; take.textContent = o === 'you' ? 'You hold this Slice' : 'Taken';
-  }
-  const mine = hero.owners.includes('you');
-  $('#earned').hidden = !mine;
-  $('#earnedV').textContent = hero.earned.toFixed(4) + ' SOL';
+  const atFloor = el >= floorMs(m);
+  $('#insPrice').textContent = fmt(priceAt(m, el));
+  $('#insBar').style.width = (atFloor ? 100 : (el % STEP) / STEP * 100) + '%';
+  $('#insNote').textContent = atFloor
+    ? `${m.label} auctions bottom out at ${m.floor} SOL and stay there until someone takes a Slice.`
+    : `${m.label} auctions start at ${m.start} SOL and drop ${m.drop} SOL every 15 seconds. Next drop in ${Math.ceil((STEP - el % STEP) / 1000)}s.`;
   $$('[data-hm]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.hm === hero.mode)));
 }
-$('#insTake').addEventListener('click', () => {
-  const i = hero.sel; if (hero.owners[i]) return;
-  const m = MODES[hero.mode]; const p = priceAt(m, performance.now() - hero.t0);
-  hero.owners[i] = 'you'; hero.paid[i] = p; hero.t0 = performance.now();
-  if (scene) scene.setOwner(i, 'you');
-  toast(`Slice ${pad(i + 1)} is yours at ${fmt(p)} SOL`);
-  const next = hero.owners.findIndex(x => !x);
-  if (next >= 0) selectLot(next, true); else renderInspector(performance.now());
-});
 $$('[data-hm]').forEach(b => b.addEventListener('click', () => { hero.mode = b.dataset.hm; hero.t0 = performance.now(); renderInspector(performance.now()); }));
-$('#insReset').addEventListener('click', () => {
-  hero.owners = ['creator', 'creator', 'creator', null, null, null, null, null, null, null];
-  hero.paid.fill(0); hero.earned = 0; hero.t0 = performance.now();
-  if (scene) scene.reset();
-  selectLot(3, true);
-});
-
+ 
 /* ================= 3D SCENE ================= */
 function initScene() {
   const wrap = $('#glWrap'); const canvas = $('#gl');
@@ -807,14 +768,14 @@ function initScene() {
   renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
+ 
   const sceneG = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
   let dist = 15;
-
+ 
   const C = { open: new THREE.Color(0xFFFFFF), creator: new THREE.Color(0x151922), you: new THREE.Color(0xFF5A1F) };
   const ACC = 0xFF5A1F;
-
+ 
   sceneG.add(new THREE.HemisphereLight(0xffffff, 0xd9dde6, 0.8));
   const key = new THREE.DirectionalLight(0xffffff, 0.85);
   key.position.set(-6, 11, 7); key.castShadow = true;
@@ -822,11 +783,11 @@ function initScene() {
   const sc = key.shadow.camera; sc.left = -7; sc.right = 7; sc.top = 7; sc.bottom = -7; sc.near = 1; sc.far = 32;
   key.shadow.bias = -0.0004; key.shadow.radius = 5;
   sceneG.add(key);
-
+ 
   // floor platform
   const floor = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 4.5, 0.24, 96), new THREE.MeshStandardMaterial({ color: 0xF0F1F4, roughness: 0.9 }));
   floor.position.y = -0.5; floor.receiveShadow = true; sceneG.add(floor);
-
+ 
   // the token: a hub in the middle of the slices
   const R0 = 0.78, R1 = 3.55, H = 0.62, BASE = -0.3, TOP = BASE + H + 0.06;
   const hub = new THREE.Group(); sceneG.add(hub);
@@ -835,7 +796,7 @@ function initScene() {
   const hubCap = new THREE.Mesh(new THREE.CylinderGeometry(R0 - 0.3, R0 - 0.3, 0.04, 64), new THREE.MeshStandardMaterial({ color: ACC, roughness: 0.5 }));
   hubCap.position.y = BASE + H + 0.52; hub.add(hubCap);
   const HUB_TOP = BASE + H + 0.55;
-
+ 
   // slices: one wedge shape centred on angle 0, copied ten times
   const SPAN = Math.PI * 2 / 10, GAP = 0.05;
   const a0 = -SPAN / 2 + GAP / 2, a1 = SPAN / 2 - GAP / 2;
@@ -879,7 +840,7 @@ function initScene() {
   if (document.fonts && document.fonts.load) {
     Promise.all([document.fonts.load('800 100px "Bricolage Grotesque"'), document.fonts.load('500 20px "DM Mono"')]).then(paintAll).catch(() => {});
   }
-
+ 
   // particles: fees flowing from the coin to held Slices
   const pGeo = new THREE.SphereGeometry(0.07, 12, 12); const pMat = new THREE.MeshBasicMaterial({ color: ACC });
   const parts = Array.from({ length: 18 }, () => {
@@ -888,10 +849,9 @@ function initScene() {
   });
   const P0 = new THREE.Vector3(0, HUB_TOP, 0), P1 = new THREE.Vector3(), P2 = new THREE.Vector3();
   function pickTarget() {
-    const owned = slabs.filter(s => s.owner); if (!owned.length) return -1;
-    return owned[Math.floor(Math.random() * owned.length)].i;
+    return Math.floor(Math.random() * slabs.length);
   }
-
+ 
   // interaction
   const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
   let rot = -Math.PI / 2 - 3 * (Math.PI * 2 / 10), vel = 0, dragging = false, moved = 0, lastX = 0, idle = 0, focusT = null;
@@ -916,7 +876,7 @@ function initScene() {
   canvas.addEventListener('pointercancel', () => { dragging = false; });
   canvas.addEventListener('pointerleave', () => { if (!dragging) { hoverI = -1; canvas.style.cursor = 'grab'; } });
   canvas.style.cursor = 'grab';
-
+ 
   function resize() {
     const r = wrap.getBoundingClientRect(); if (!r.width || !r.height) return;
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
@@ -926,7 +886,7 @@ function initScene() {
     camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(wrap); resize();
-
+ 
   let last = performance.now(), time = 0;
   function step(now) {
     const dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
@@ -976,9 +936,8 @@ function initScene() {
   }
   function arrive(i) {
     const s = slabs[i]; if (!s) return; s.pulse = 1;
-    if (s.owner === 'you') { hero.earned += 0.0006; }
   }
-
+ 
   let running = false, raf = 0;
   function loop(now) { if (!running) return; raf = requestAnimationFrame(loop); step(now); }
   new IntersectionObserver(es => {
@@ -987,7 +946,7 @@ function initScene() {
     else if (!v) { running = false; cancelAnimationFrame(raf); }
   }).observe(canvas);
   step(performance.now());
-
+ 
   return {
     setOwner(i, o) { slabs[i].owner = o; paint(slabs[i]); slabs[i].pulse = 1; },
     select(i, focus) { selI = i; if (focus) { focusT = -Math.PI / 2 - i * SPAN; } },
@@ -996,7 +955,7 @@ function initScene() {
 }
 scene = initScene();
 selectLot(3, false);
-
+ 
 /* ================= AUCTION CHART ================= */
 (function () {
   const svg = $('#chart'); const NS = 'http://www.w3.org/2000/svg';
@@ -1040,18 +999,9 @@ selectLot(3, false);
   new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(svg);
   window.__chartTick = now => { if (vis) tick(now); };
 })();
-
+ 
 /* ================= LAUNCHES ================= */
-const SAMPLE = [
-  { name: 'Pocket Rocket', sym: 'ROCK', venue: 'Pump', mode: 'degen', sold: 4, hue: '#FFD9CC' },
-  { name: 'Slow Mail', sym: 'SNAIL', venue: 'Pump', mode: 'degen', sold: 7, hue: '#DDE6FF' },
-  { name: 'Night Bus', sym: 'NBUS', venue: 'Meteora', mode: 'builder', sold: 2, hue: '#D9F2E6' },
-  { name: 'Tin Frog', sym: 'TINF', venue: 'Pump', mode: 'degen', sold: 9, hue: '#F2E3FF' },
-  { name: 'Paper Moon', sym: 'PAPR', venue: 'Meteora', mode: 'builder', sold: 5, hue: '#FFF0C9' },
-  { name: 'Cold Brew', sym: 'BREW', venue: 'Pump', mode: 'degen', sold: 1, hue: '#E5E7EB' },
-  { name: 'Harbor Light', sym: 'HRBR', venue: 'Meteora', mode: 'builder', sold: 10, hue: '#D9F2E6' },
-  { name: 'Quiet Riot', sym: 'RIOT', venue: 'Pump', mode: 'degen', sold: 10, hue: '#FFD9CC' }
-];
+const SAMPLE = [];
 let launches = SAMPLE.map((l, i) => ({ ...l, id: i, t0: performance.now() - ((i * 13700) % 100000) }));
 let tab = 'top';
 const TABS = [
@@ -1081,7 +1031,7 @@ function cardHTML(l) {
 function renderGrid(animate) {
   const f = TABS.find(t => t[0] === tab)[2]; const list = f(launches);
   const grid = $('#grid');
-  grid.innerHTML = list.length ? list.map(cardHTML).join('') : `<div class="empty">No launches here yet.</div>`;
+  grid.innerHTML = list.length ? list.map(cardHTML).join('') : `<div class="empty">${launches.length ? 'No launches in this view yet.' : 'No launches yet. The first one will show up here.'}</div>`;
   if (animate && !reduce) $$('.card, .empty', grid).forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: i * 55, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
   updateCards(performance.now());
 }
@@ -1130,7 +1080,7 @@ $('#grid').addEventListener('pointermove', e => {
 });
 $('#grid').addEventListener('pointerout', e => { const c = e.target.closest('.card'); if (c) { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); } });
 renderTabs(); renderGrid(false);
-
+ 
 /* ================= LIVE (on-chain) HOOKS ================= */
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function netName() { return window.StacksChain && window.StacksChain.cluster === 'mainnet-beta' ? 'Solana' : 'Solana devnet'; }
@@ -1170,7 +1120,7 @@ function onChainReady() {
   window.StacksUI.renderMine(null);
 }
 if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:ready', onChainReady);
-
+ 
 /* ================= LAUNCH FORM ================= */
 (function () {
   const f = { venue: 'pump', mode: 'degen', pre: 3, img: null };
@@ -1178,7 +1128,7 @@ if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:rea
   const nameI = $('#tName'), symI = $('#tSym'), dev = $('#dev');
   const seg = $('#preSeg');
   for (let i = 1; i <= 10; i++) { const s = document.createElement('span'); s.textContent = pad(i); seg.appendChild(s); }
-
+ 
   function devVal() { const v = parseFloat(String(dev.value).replace(',', '.')); return isFinite(v) && v > 0 ? v : 0; }
   function missing() {
     const m = []; if (!nameI.value.trim()) m.push('a token name'); if (!symI.value.trim()) m.push('a symbol'); if (!f.img) m.push('a token image'); return m;
@@ -1210,7 +1160,7 @@ if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:rea
     if (i === dev) i.value = i.value.replace(/[^0-9.,]/g, '');
     render();
   }));
-
+ 
   // image
   const drop = $('#drop'), file = $('#tImg');
   function setFile(fl) {
@@ -1226,7 +1176,7 @@ if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:rea
   ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
   ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
-
+ 
   // launch
   let busy = false;
   const btn = $('#launchBtn');
@@ -1235,20 +1185,10 @@ if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:rea
     const miss = missing();
     if (miss.length) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast('Add ' + miss.join(', ').replace(/, ([^,]*)$/, ' and $1') + ' first.'); return; }
     if (isLive()) return liveLaunch();
-    if (walletProvider() && !wallet.address) { const ok = await connectWallet(); if (!ok) return; }
-    busy = true; btn.disabled = true; $('#doneBox').hidden = true;
-    const sym = symI.value || 'TOKEN';
-    const labels = [`Uploading ${f.img.name}`, `Creating $${sym} on ${venueName()}`, f.pre ? `Reserving ${f.pre} Slice${f.pre > 1 ? 's' : ''} for you` : 'No pre-buy, skipping reservation', 'Opening the auction'];
-    const ol = $('#progress'); ol.hidden = false; ol.innerHTML = labels.map(l => `<li><i></i>${l}</li>`).join('');
-    const items = $$('li', ol);
-    for (let i = 0; i < items.length; i++) {
-      items[i].className = 'run'; await new Promise(r => setTimeout(r, 750)); items[i].className = 'done';
-    }
-    const box = $('#doneBox'); box.hidden = false;
-    box.innerHTML = `<b>Preview complete.</b> $${sym} on ${venueName()} with ${10 - f.pre} Slices up for auction. This build does not send transactions, so nothing was created on-chain yet.`;
-    busy = false; btn.disabled = false; toast('Launch preview complete');
+    $('#help').textContent = 'Launching opens as soon as Slice goes live on Solana. Your details are saved on this page until then.';
+    toast('Launching opens soon');
   });
-
+ 
   async function liveLaunch() {
     if (!wallet.address) { const ok = await connectWallet(); if (!ok) return; }
     busy = true; btn.disabled = true; $('#doneBox').hidden = true;
@@ -1278,7 +1218,7 @@ if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:rea
   }
   render();
 })();
-
+ 
 /* ================= DOCS ROUTING ================= */
 (function () {
   const main = $('#top'), docs = $('#docsView'); const links = $$('.dside a');
@@ -1301,7 +1241,7 @@ if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:rea
   $$('[data-ds]').forEach(s => io.observe(s));
   show();
 })();
-
+ 
 /* ================= TICKER ================= */
 let lastUI = 0;
 function tick(now) {
@@ -1314,3 +1254,4 @@ requestAnimationFrame(tick);
 </script>
 </body>
 </html>
+ 
