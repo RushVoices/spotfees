@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Instrument+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: oversized headline over a three-column stage (copy | 3D ring of ten Slices | inspector), then how-it-works, launches grid, launch form. Single committed white look. */
+:root{
+  --paper:#FCFCFB; --paper-2:#F3F4F6; --ink:#0F1217; --ink-2:#3B424D; --mute:#6E7582;
+  --line:#E3E5E9; --accent:#FF5A1F; --accent-soft:#FFE8DF; --good:#0F8A5F;
+  --display:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif;
+  --body:'Instrument Sans','Helvetica Neue',Arial,sans-serif;
+  --mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;
+  --r-s:10px; --r-m:20px;
+  --shadow:0 1px 2px rgba(15,18,23,.05),0 18px 40px -18px rgba(15,18,23,.22);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.55 var(--body);padding-inline:clamp(16px,4vw,40px);padding-block:0;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1240px;margin-inline:auto}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin:0 0 18px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--accent);display:block}
+.display{font-family:var(--display);font-variation-settings:"wdth" 82,"opsz" 96;font-weight:760;letter-spacing:-.035em;line-height:.93;text-wrap:balance;margin:0}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:11px 20px;font-weight:600;font-size:.95rem;text-decoration:none;border:1.5px solid var(--ink);background:transparent;transition:background .25s var(--ease),color .25s var(--ease),transform .25s var(--ease),border-color .25s var(--ease);white-space:nowrap}
+.btn.solid{background:var(--ink);color:#fff}
+.btn.solid:hover{background:var(--accent);border-color:var(--accent)}
+.btn.ghost:hover{background:var(--ink);color:#fff}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.lg{padding:15px 28px;font-size:1.02rem}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+.nav.scrolled{border-color:var(--line)}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--display);font-variation-settings:"wdth" 90,"opsz" 40;font-weight:800;font-size:1.7rem;letter-spacing:-.04em}
+.links{display:flex;gap:28px}
+.links a{text-decoration:none;font-size:.95rem;color:var(--ink-2);position:relative;padding-block:4px}
+.links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.links a:hover::after{transform:scaleX(1)}
+.nav-r{display:flex;gap:10px}
+@media (max-width:820px){.links{display:none}}
+@media (max-width:520px){#walletBtn{display:none}}
+
+/* hero */
+.hero{padding-top:clamp(28px,5vw,64px);position:relative}
+.hero h1{font-size:clamp(2.7rem,8.4vw,7.6rem);max-width:15ch}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.hero h1 .w>span{display:inline-block;transform:translateY(105%);animation:rise 1s var(--ease) forwards;animation-delay:calc(var(--i)*70ms + 150ms)}
+@keyframes rise{to{transform:none}}
+.hero h1 .hot{color:var(--accent);transition:font-variation-settings .6s var(--ease)}
+.hero h1 .hot:hover{font-variation-settings:"wdth" 100,"opsz" 96}
+.stage-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2fr) minmax(250px,1fr);gap:clamp(12px,2vw,28px);align-items:center;margin-top:clamp(12px,2vw,28px);position:relative}
+.stage-grid::before{content:"";position:absolute;inset:0 -4%;background-image:radial-gradient(var(--line) 1.2px,transparent 1.4px);background-size:22px 22px;-webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 20%,transparent 75%);pointer-events:none;z-index:0}
+.stage-grid>*{position:relative;z-index:1;min-width:0}
+.copy .lede{font-size:clamp(1.1rem,1.6vw,1.35rem);line-height:1.45;color:var(--ink-2);margin:0 0 26px;max-width:30ch;opacity:0;animation:fade .9s var(--ease) .9s forwards}
+.copy .cta{display:flex;flex-wrap:wrap;gap:10px;opacity:0;animation:fade .9s var(--ease) 1.05s forwards}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:30px 0 0;padding:0;list-style:none;opacity:0;animation:fade .9s var(--ease) 1.2s forwards}
+.legend li{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--ink-2)}
+.dot{width:12px;height:12px;border-radius:4px;display:inline-block;border:1.5px solid var(--ink)}
+.dot.c{background:var(--ink)} .dot.y{background:var(--accent);border-color:var(--accent)} .dot.o{background:#fff}
+.gl-wrap{position:relative;height:clamp(380px,46vw,600px);touch-action:pan-y;opacity:0;animation:fade 1.2s var(--ease) .5s forwards}
+#gl{width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
+.hint{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);pointer-events:none;white-space:nowrap}
+.fallback{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;color:var(--mute);padding:24px}
+.nogl .fallback{display:flex}
+.nogl #gl,.nogl .hint{display:none}
+@media (max-width:1100px){
+  .stage-grid{grid-template-columns:minmax(0,1fr)}
+  .copy .lede{max-width:44ch}
+  .gl-wrap{height:min(92vw,520px)}
+}
+
+/* inspector */
+.inspect{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);box-shadow:var(--shadow);padding:20px;display:flex;flex-direction:column;gap:14px}
+.seg{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.seg button{height:30px;padding:0;min-width:0;border:0;border-radius:6px;font-family:var(--mono);font-size:.62rem;background:var(--paper-2);color:var(--ink);transition:transform .2s var(--ease),background .3s,box-shadow .2s}
+.seg button:hover{transform:translateY(-2px)}
+.seg button.creator{background:var(--ink);color:#fff}
+.seg button.you{background:var(--accent);color:#fff}
+.seg button.sel{box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--ink)}
+.ins-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ins-slice{font-family:var(--display);font-variation-settings:"wdth" 82,"opsz" 60;font-weight:760;font-size:2.4rem;letter-spacing:-.04em;line-height:1}
+.ins-slice small{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--mute);margin-right:8px;font-weight:400}
+.pill{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--paper-2);color:var(--ink-2);white-space:nowrap}
+.pill.open{background:#E3F5EC;color:var(--good)}
+.pill.you{background:var(--accent-soft);color:#B53A0A}
+.price-row{display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+.price-row b{font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 60;font-weight:700;font-size:2.7rem;letter-spacing:-.04em;line-height:1}
+.price-row small{color:var(--mute);font-family:var(--mono);font-size:.78rem}
+.price-row .lab{margin-left:auto}
+.bar{height:4px;border-radius:4px;background:var(--paper-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--ink);border-radius:4px}
+.ins-note{margin:0;font-size:.88rem;color:var(--ink-2);min-height:2.6em}
+.ins-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.toggle{display:inline-flex;background:var(--paper-2);border-radius:999px;padding:3px}
+.toggle button{border:0;background:transparent;border-radius:999px;padding:5px 12px;font-size:.8rem;font-weight:500;color:var(--mute);transition:background .25s,color .25s}
+.toggle button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.linkbtn{background:none;border:0;padding:0;font-size:.8rem;color:var(--mute);text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{color:var(--ink)}
+.earned{font-size:.8rem;color:var(--ink-2);display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:10px;font-variant-numeric:tabular-nums}
+
+/* sections */
+.section{padding-top:clamp(72px,11vw,150px);scroll-margin-top:56px}
+.sec-head{margin-bottom:clamp(28px,4vw,56px);max-width:900px}
+.sec-head h2{font-size:clamp(2.2rem,5.6vw,4.6rem)}
+.sec-head p.sub{font-size:1.15rem;color:var(--ink-2);margin:20px 0 0;max-width:46ch}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{animation:revealIn linear both;animation-timeline:view();animation-range:entry 0% entry 45%}
+  }
+}
+@keyframes revealIn{from{opacity:.12;transform:translateY(36px)}to{opacity:1;transform:none}}
+
+/* how */
+.how-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,5vw,72px);align-items:start}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{border-top:1.5px solid var(--ink);padding:22px 0 30px;display:grid;grid-template-columns:44px 1fr;gap:6px 12px;transition:padding-left .45s var(--ease)}
+.steps li:last-child{border-bottom:1.5px solid var(--ink)}
+.steps li:hover{padding-left:12px}
+.steps .n{font-family:var(--mono);font-size:.78rem;color:var(--mute);padding-top:10px}
+.steps h3{font-family:var(--display);font-variation-settings:"wdth" 85,"opsz" 48;font-weight:720;font-size:clamp(1.7rem,3vw,2.4rem);letter-spacing:-.03em;margin:0;line-height:1.05;transition:color .3s}
+.steps li:hover h3{color:var(--accent)}
+.steps p{grid-column:2;margin:6px 0 0;color:var(--ink-2);max-width:44ch}
+.chart-card{margin:0;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);box-shadow:var(--shadow);padding:20px 20px 16px;position:sticky;top:90px}
+.chart-top{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:space-between;align-items:center;margin-bottom:14px}
+.chart-top .mono{margin-right:auto}
+#chart{width:100%;height:auto;display:block;overflow:visible}
+#chart text{font-family:var(--mono);font-size:11px;fill:var(--mute)}
+#chart .grid{stroke:var(--line);stroke-width:1}
+#chart .axis{stroke:var(--ink);stroke-width:1.2}
+#chart .st{fill:none;stroke-width:2.4;stroke-linejoin:round;transition:opacity .4s,stroke-width .4s}
+#chart .st.degen{stroke:var(--accent)} #chart .st.builder{stroke:var(--ink)}
+#chart .st.dim{opacity:.22;stroke-width:1.6}
+#chart .tag{fill:var(--ink);font-size:12px;font-weight:500}
+#chart .tag.degen{fill:#C8400F}
+#chart .floor{stroke:var(--mute);stroke-dasharray:3 4;stroke-width:1}
+.readout{font-family:var(--mono);font-size:.78rem;color:var(--ink-2);margin-top:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+@media (max-width:900px){.how-grid{grid-template-columns:minmax(0,1fr)}.chart-card{position:static}}
+
+/* launches */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px}
+.tab{border:0;background:transparent;border-radius:10px;padding:10px 16px;font-weight:500;display:flex;gap:10px;align-items:center;color:var(--ink-2);transition:background .25s,color .25s}
+.tab span{font-family:var(--mono);font-size:.78rem;color:var(--mute);font-variant-numeric:tabular-nums}
+.tab:hover{background:var(--paper-2)}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+.tab[aria-selected="true"] span{color:rgba(255,255,255,.65)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:18px;perspective:1100px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r-m);padding:20px;display:flex;flex-direction:column;gap:16px;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s var(--ease),box-shadow .4s var(--ease),border-color .3s;will-change:transform;transform-style:preserve-3d}
+.card:hover{box-shadow:var(--shadow);border-color:#D3D6DC;transition:transform .12s linear,box-shadow .4s var(--ease),border-color .3s}
+.card.flash{animation:flash 1s var(--ease)}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(255,90,31,.55)}100%{box-shadow:0 0 0 18px rgba(255,90,31,0)}}
+.c-head{display:flex;align-items:center;gap:12px}
+.av{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.2rem;flex:none}
+.c-head h3{margin:0;font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 36;font-weight:700;font-size:1.25rem;letter-spacing:-.025em;line-height:1.1}
+.c-head .mono{display:block;margin-top:2px;letter-spacing:.06em}
+.c-head .tag{margin-left:auto}
+.slices{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.slices i{height:22px;border-radius:4px;background:var(--paper-2);transition:background .4s,transform .4s var(--ease)}
+.slices i.on{background:var(--ink)}
+.slices i.new{background:var(--accent);transform:translateY(-4px)}
+.c-meta{display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-2)}
+.c-px{display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums}
+.c-px b{font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 48;font-weight:700;font-size:1.9rem;letter-spacing:-.035em;line-height:1}
+.c-px small{color:var(--mute);font-family:var(--mono);font-size:.74rem}
+.c-px .t{margin-left:auto;font-family:var(--mono);font-size:.7rem;color:var(--mute);letter-spacing:.04em}
+.card .btn{width:100%;padding:11px}
+.empty{grid-column:1/-1;border:1.5px dashed var(--line);border-radius:var(--r-m);padding:48px 24px;text-align:center;color:var(--mute)}
+.note{margin-top:22px;color:var(--mute);font-size:.85rem}
+
+/* launch form */
+.launch-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:clamp(24px,4vw,56px);align-items:start}
+.form{display:flex;flex-direction:column;gap:0}
+.block{padding:34px 0;border-top:1px solid var(--line)}
+.block:first-child{border-top:0;padding-top:0}
+.block h3{font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 48;font-weight:720;font-size:1.9rem;letter-spacing:-.03em;margin:0 0 20px;display:flex;align-items:baseline;gap:12px;line-height:1}
+.block h3 .n{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:var(--mute);font-weight:400}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{padding:0;margin-bottom:10px}
+.venues{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.venue{display:flex;align-items:center;gap:12px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:14px 16px;transition:border-color .3s,background .3s,transform .3s var(--ease)}
+.venue:hover{transform:translateY(-2px)}
+.venue[aria-checked="true"]{border-color:var(--ink);background:var(--paper-2)}
+.venue b{display:block;font-weight:600;line-height:1.2}
+.venue .mono{letter-spacing:.04em}
+.venue svg{flex:none}
+.row2{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field label,.lbl{font-size:.82rem;font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.field label span,.lbl span{font-family:var(--mono);font-weight:400;color:var(--mute);font-size:.72rem}
+.in{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:13px 14px;font:inherit;color:var(--ink);transition:border-color .25s,box-shadow .25s}
+.in::placeholder{color:#A4AAB5}
+.in:hover{border-color:#CBCFD6}
+.in:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(15,18,23,.07)}
+.drop{display:grid;place-items:center;text-align:center;min-height:170px;border:1.5px dashed #C9CDD5;border-radius:16px;background:#fff;cursor:pointer;padding:20px;transition:border-color .3s,background .3s;position:relative;overflow:hidden;gap:6px;color:var(--ink-2)}
+.drop:hover,.drop.over{border-color:var(--ink);background:var(--paper-2)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop img{width:104px;height:104px;border-radius:24px;object-fit:cover;box-shadow:var(--shadow)}
+.drop .fn{font-family:var(--mono);font-size:.74rem;color:var(--mute);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hintline{font-size:.8rem;color:var(--mute);margin:8px 0 0}
+.err{color:#C0360A}
+details.social{margin-top:20px}
+details.social summary{cursor:pointer;font-weight:600;font-size:.9rem;list-style:none;display:flex;align-items:center;gap:8px}
+details.social summary::-webkit-details-marker{display:none}
+details.social summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(-45deg);transition:transform .3s var(--ease)}
+details.social[open] summary::before{transform:rotate(45deg)}
+details.social summary span{font-family:var(--mono);font-weight:400;color:var(--mute);font-size:.72rem}
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mode{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .3s,background .3s,transform .4s var(--ease),box-shadow .4s}
+.mode:hover{transform:translateY(-3px)}
+.mode[aria-checked="true"]{border-color:var(--ink);box-shadow:var(--shadow)}
+.mode[data-mode="degen"][aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.mode .top{display:flex;justify-content:space-between;align-items:center}
+.mode .top b{font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 36;font-weight:720;font-size:1.4rem;letter-spacing:-.03em}
+.mode p{margin:0;font-size:.88rem;color:var(--ink-2)}
+.mode dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:.84rem}
+.mode dt{color:var(--mute)} .mode dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.stepper{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.step-ctl{display:inline-flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.step-ctl button{width:44px;height:44px;border:0;background:transparent;font-size:1.2rem;transition:background .2s}
+.step-ctl button:hover{background:var(--paper-2)}
+.step-ctl output{min-width:48px;display:grid;place-items:center;font-family:var(--mono);font-weight:500;border-inline:1.5px solid var(--line)}
+.preseg{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;margin-top:16px}
+.preseg span{height:34px;border-radius:7px;display:grid;place-items:center;font-family:var(--mono);font-size:.64rem;background:var(--paper-2);color:#B0B5BF;transition:background .35s,color .35s,transform .45s var(--ease)}
+.preseg span.pre{background:var(--ink);color:#fff;transform:translateY(-5px)}
+.preseg span.avail{background:#fff;border:1.5px solid var(--line);color:var(--mute)}
+.est{display:flex;justify-content:space-between;margin-top:12px;font-size:.85rem;color:var(--ink-2)}
+.est b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+
+.summary{position:sticky;top:90px;background:#fff;border:1px solid var(--line);border-radius:var(--r-m);box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:16px}
+.summary h3{margin:0;font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 36;font-weight:720;font-size:1.35rem;letter-spacing:-.03em}
+.sum-rows{margin:0;display:grid;gap:10px}
+.sum-rows div{display:flex;justify-content:space-between;gap:12px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.sum-rows dt{color:var(--mute)} .sum-rows dd{margin:0;font-family:var(--mono);font-size:.84rem;text-align:right}
+.sum-rows .total{border-top:1.5px solid var(--ink);padding-top:12px;font-weight:600}
+.sum-rows .total dd{font-size:1.05rem;font-weight:500}
+.next{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:n;font-size:.84rem;color:var(--ink-2);border-top:1px solid var(--line);padding-top:16px}
+.next li{counter-increment:n;display:flex;gap:10px}
+.next li::before{content:counter(n);font-family:var(--mono);font-size:.68rem;color:var(--mute);padding-top:2px;min-width:12px}
+.help{font-size:.82rem;color:var(--mute);margin:0;min-height:2.4em}
+.preview-flag{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:#B53A0A;background:var(--accent-soft);padding:6px 10px;border-radius:8px;align-self:flex-start}
+.progress{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.progress li{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--mute);transition:color .3s}
+.progress li i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line);flex:none;transition:background .3s,border-color .3s}
+.progress li.run{color:var(--ink)} .progress li.run i{border-color:var(--ink);border-top-color:transparent;animation:spin .7s linear infinite}
+.progress li.done{color:var(--ink)} .progress li.done i{background:var(--good);border-color:var(--good)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.done-box{border-top:1px solid var(--line);padding-top:14px;font-size:.88rem;color:var(--ink-2)}
+.done-box b{color:var(--ink)}
+.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@media (max-width:980px){.launch-grid{grid-template-columns:minmax(0,1fr)}.summary{position:static}}
+@media (max-width:620px){.social-grid{grid-template-columns:1fr}.modes{grid-template-columns:1fr}.row2{grid-template-columns:1fr}}
+
+footer{margin-top:clamp(80px,12vw,160px);border-top:1px solid var(--line);padding-block:36px 48px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;align-items:center;color:var(--mute);font-size:.88rem}
+/* docs */
+.docs{padding-top:clamp(28px,5vw,72px)}
+.docs-head{margin-bottom:clamp(32px,5vw,64px);max-width:900px}
+.docs-head h1{font-size:clamp(2.6rem,7vw,5.6rem)}
+.docs-head p{font-size:1.2rem;color:var(--ink-2);margin:20px 0 0;max-width:48ch}
+.docs-grid{display:grid;grid-template-columns:220px minmax(0,1fr);gap:clamp(24px,5vw,80px);align-items:start}
+.dside{position:sticky;top:92px;display:flex;flex-direction:column;gap:2px;border-left:1.5px solid var(--line)}
+.dside .mono{padding:0 0 10px 16px}
+.dside a{display:block;text-decoration:none;color:var(--mute);font-size:.94rem;padding:7px 16px;margin-left:-1.5px;border-left:1.5px solid transparent;transition:color .25s,border-color .25s,padding-left .35s var(--ease)}
+.dside a:hover{color:var(--ink);padding-left:20px}
+.dside a.on{color:var(--ink);border-left-color:var(--ink);font-weight:600}
+.dbody{max-width:720px;min-width:0}
+.dbody section{padding-bottom:clamp(40px,6vw,72px);scroll-margin-top:92px}
+.dbody h2{font-family:var(--display);font-variation-settings:"wdth" 86,"opsz" 60;font-weight:740;font-size:clamp(1.9rem,3.6vw,2.7rem);letter-spacing:-.035em;line-height:1;margin:0 0 20px}
+.dbody h3{font-family:var(--display);font-variation-settings:"wdth" 90,"opsz" 30;font-weight:700;font-size:1.25rem;letter-spacing:-.02em;margin:28px 0 8px}
+.dbody p{font-size:1.06rem;line-height:1.7;color:var(--ink-2);margin:0 0 16px}
+.dbody p strong{color:var(--ink);font-weight:600}
+.dbody code{font-family:var(--mono);font-size:.86em;background:var(--paper-2);border-radius:6px;padding:2px 7px;color:var(--ink)}
+.formula{font-family:var(--mono);font-size:.95rem;background:var(--ink);color:#fff;border-radius:14px;padding:18px 22px;margin:20px 0;overflow-x:auto;white-space:nowrap}
+.formula b{color:#FFB08F;font-weight:500}
+.dbody .slices{margin:22px 0 8px}
+.dbody .slices i{height:40px;display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:.7rem;color:var(--mute)}
+.dbody .slices i.on{color:#fff}
+.dbody .slices i.new{color:#fff}
+.tbl{width:100%;border-collapse:collapse;margin:20px 0;font-size:.95rem;font-variant-numeric:tabular-nums}
+.tbl th{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:400;text-align:left;padding:10px 14px 10px 0;border-bottom:1.5px solid var(--ink);white-space:nowrap}
+.tbl td{padding:13px 14px 13px 0;border-bottom:1px solid var(--line);color:var(--ink-2);vertical-align:top}
+.tbl td:first-child{color:var(--ink);font-weight:600}
+.tbl-wrap{overflow-x:auto}
+.flow{list-style:none;margin:24px 0;padding:0;counter-reset:f;position:relative}
+.flow::before{content:"";position:absolute;left:17px;top:18px;bottom:18px;width:1.5px;background:var(--line)}
+.flow li{counter-increment:f;display:grid;grid-template-columns:36px 1fr;gap:16px;padding:0 0 26px;position:relative}
+.flow li:last-child{padding-bottom:0}
+.flow li::before{content:counter(f);width:36px;height:36px;border-radius:50%;background:var(--paper);border:1.5px solid var(--ink);display:grid;place-items:center;font-family:var(--mono);font-size:.78rem;transition:background .3s,color .3s,transform .4s var(--ease)}
+.flow li:hover::before{background:var(--ink);color:#fff;transform:scale(1.1)}
+.flow h3{margin:4px 0 4px;font-size:1.15rem}
+.flow p{margin:0;font-size:1rem}
+.callout{border-radius:var(--r-m);background:var(--accent-soft);padding:20px 22px;margin:22px 0;color:#5A2410}
+.callout p{color:inherit;margin:0;font-size:1rem}
+.callout strong{color:#3B1507}
+.faq details{border-top:1px solid var(--line);padding:16px 0}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;font-weight:600;font-size:1.04rem;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--mono);color:var(--mute);transition:transform .3s var(--ease)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin:10px 0 0}
+@media (max-width:860px){.docs-grid{grid-template-columns:minmax(0,1fr)}.dside{position:static;flex-direction:row;flex-wrap:wrap;border-left:0;gap:6px}.dside .mono{width:100%;padding:0}.dside a{border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;margin:0}.dside a:hover{padding-left:14px}.dside a.on{border-color:var(--ink)}}
+.mine-list{display:flex;flex-direction:column;gap:10px}
+.mine-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.mine-row b{display:block;font-family:var(--display);font-variation-settings:"wdth" 88,"opsz" 36;font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
+.mine-row .mono{letter-spacing:.04em;text-transform:none}
+.mine-amt{font-variant-numeric:tabular-nums;text-align:right}
+.mine-amt b{display:inline;font-size:1.3rem}
+.mine-amt small{color:var(--mute)}
+.mine-act{display:flex;gap:8px}
+.mine-act .btn{padding:9px 16px;font-size:.88rem}
+.live-only{display:none}
+.is-live .live-only{display:inline}
+.is-live .preview-flag{color:var(--good);background:#E3F5EC}
+@media (max-width:700px){.mine-row{grid-template-columns:minmax(0,1fr)}.mine-amt{text-align:left}}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .35s var(--ease),transform .35s var(--ease);z-index:50;max-width:min(92vw,520px);text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){
+  .hero h1 .w>span{transform:none;animation:none}
+  .copy .lede,.copy .cta,.legend,.gl-wrap{opacity:1;animation:none}
+  .card,.steps li,.seg button,.venue,.mode{transition:none}
+}
+</style>
+
+</head>
+<body>
+<header class="nav wrap" id="nav" style="background-color:color-mix(in srgb,#FCFCFB 86%,transparent)">
+  <a class="brand" href="#top" aria-label="Slice home">
+    <svg width="26" height="26" viewBox="0 0 100 100" aria-hidden="true"><g fill="#0F1217"><path d="M50.49 48.48L50.49 10.48A38.0 38.0 0 0 1 72.83 17.74Z"/><path d="M51.60 50.00L87.74 38.26A38.0 38.0 0 0 1 87.74 61.74Z"/><path d="M51.29 50.94L87.43 62.68A38.0 38.0 0 0 1 73.63 81.68Z"/><path d="M50.49 51.52L72.83 82.26A38.0 38.0 0 0 1 50.49 89.52Z"/><path d="M49.51 51.52L49.51 89.52A38.0 38.0 0 0 1 27.17 82.26Z"/><path d="M48.71 50.94L26.37 81.68A38.0 38.0 0 0 1 12.57 62.68Z"/><path d="M48.40 50.00L12.26 61.74A38.0 38.0 0 0 1 12.26 38.26Z"/><path d="M48.71 49.06L12.57 37.32A38.0 38.0 0 0 1 26.37 18.32Z"/><path d="M49.51 48.48L27.17 17.74A38.0 38.0 0 0 1 49.51 10.48Z"/></g><path d="M58.58 43.77L80.91 13.03A38.0 38.0 0 0 1 94.72 32.03Z" fill="#FF5A1F"/></svg>
+    <span>Slice</span>
+  </a>
+  <nav class="links" aria-label="Sections"><a href="#how">How it works</a><a href="#launches">Launches</a><a href="#launch">Launch</a><a href="#mine" class="live-only">My Slices</a><a href="#docs">Docs</a></nav>
+  <div class="nav-r">
+    <button class="btn ghost" id="walletBtn" type="button">Connect wallet</button>
+    <a class="btn solid" href="#launch">Launch a token</a>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <h1 class="display" id="h1" data-text="Great things happen when ownership is shared.">Great things happen when ownership is shared.</h1>
+
+    <div class="stage-grid">
+      <div class="copy">
+        <p class="lede">Turn a token’s creator fees into ten Slices. Buy a share. Earn as it trades.</p>
+        <div class="cta">
+          <a class="btn solid lg" href="#launch">Launch a token</a>
+          <a class="btn ghost lg" href="#launches">Find a Slice</a>
+        </div>
+        <ul class="legend" aria-label="Slice colors">
+          <li><i class="dot c"></i>Creator</li>
+          <li><i class="dot y"></i>Yours</li>
+          <li><i class="dot o"></i>Open</li>
+        </ul>
+      </div>
+
+      <div class="gl-wrap" id="glWrap">
+        <canvas id="gl" aria-label="Ten Slices arranged around a token. Drag to turn, click a Slice to inspect it."></canvas>
+        <div class="fallback"><span>The 3D view needs WebGL. Pick a Slice from the selector.</span></div>
+        <div class="hint mono">Drag to turn · Click a Slice</div>
+      </div>
+
+      <aside class="inspect" aria-label="Slice inspector">
+        <div class="mono">Sample auction</div>
+        <div class="seg" id="heroSeg" role="group" aria-label="Choose a Slice"></div>
+        <div class="ins-top"><div class="ins-slice"><small>SLICE</small><span id="insLot">04</span></div><span class="pill open" id="insPill">Open</span></div>
+        <div class="price-row"><b id="insPrice">1.500</b><small>SOL</small><span class="mono lab" id="insPriceLab">Price now</span></div>
+        <div class="bar" aria-hidden="true"><i id="insBar"></i></div>
+        <p class="ins-note" id="insNote"></p>
+        <button class="btn solid" id="insTake" type="button">Take Slice 04</button>
+        <div class="ins-foot">
+          <div class="toggle" role="group" aria-label="Auction mode"><button type="button" data-hm="degen" aria-pressed="true">Degen</button><button type="button" data-hm="builder" aria-pressed="false">Builder</button></div>
+          <button class="linkbtn" id="insReset" type="button">Reset</button>
+        </div>
+        <div class="earned" id="earned" hidden><span>Sample fees to your Slices</span><b id="earnedV">0.0000 SOL</b></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="sec-head reveal">
+      <p class="eyebrow">How a Slice works</p>
+      <h2 class="display">One fee stream, split ten ways.</h2>
+    </div>
+    <div class="how-grid">
+      <ol class="steps reveal">
+        <li><span class="n">01</span><h3>Launch</h3><p>Pick a venue, name the token, and choose Degen or Builder pricing. Pre-buy up to five Slices at the floor price before the public sees them.</p></li>
+        <li><span class="n">02</span><h3>Auction</h3><p>The remaining Slices open at the start price and step down every 15 seconds until someone takes one.</p></li>
+        <li><span class="n">03</span><h3>Earn</h3><p>Each Slice holds a tenth of the token’s creator fees. As the token trades, holders get paid.</p></li>
+      </ol>
+      <figure class="chart-card reveal">
+        <div class="chart-top">
+          <span class="mono">Price per Slice, SOL</span>
+          <div class="toggle" role="group" aria-label="Chart mode"><button type="button" data-cm="degen" aria-pressed="true">Degen</button><button type="button" data-cm="builder" aria-pressed="false">Builder</button></div>
+          <div class="toggle" role="group" aria-label="Playback speed"><button type="button" data-sp="1" aria-pressed="true">1×</button><button type="button" data-sp="10" aria-pressed="false">10×</button></div>
+        </div>
+        <svg id="chart" viewBox="0 0 640 300" role="img" aria-label="Staircase chart of Slice price falling every 15 seconds from the start price to the floor, for Degen and Builder modes"></svg>
+        <div class="readout"><span id="chartRead"></span><span>Seconds since the auction opened</span></div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="launches">
+    <div class="sec-head reveal"><p class="eyebrow">Browse</p><h2 class="display">Find your next Slice<span style="color:var(--accent)">.</span></h2></div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Launch filters"></div>
+    <div class="grid" id="grid" role="tabpanel"></div>
+    <p class="note" id="gridNote">These are sample launches for the layout. Prices step down live; taking a Slice resets that card’s auction.</p>
+  </section>
+
+  <section class="section" id="mine" hidden>
+    <div class="sec-head"><p class="eyebrow">Your Slices</p><h2 class="display">What you’ve earned.</h2><p class="sub">Fees build up in each Slice as the token trades. Collect fees pays out everything the token has earned so far to all ten Slices, then Claim sends your share to your wallet.</p></div>
+    <div id="mineList" class="mine-list"></div>
+    <p class="note"><button class="linkbtn" id="mineConnect" type="button">Connect wallet</button> to refresh this list.</p>
+  </section>
+
+  <section class="section" id="launch">
+    <div class="sec-head reveal">
+      <p class="eyebrow">Launch</p>
+      <h2 class="display">Start something worth sharing.</h2>
+      <p class="sub">Ten Slices. One fee stream. Set the terms and open the auction.</p>
+    </div>
+    <div class="launch-grid">
+      <form class="form" id="launchForm" novalidate autocomplete="off">
+        <div class="block">
+          <fieldset>
+            <legend class="mono">Trading venue</legend>
+            <div class="venues" role="radiogroup" aria-label="Trading venue">
+              <button type="button" class="venue" role="radio" aria-checked="true" data-venue="pump">
+                <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><g transform="rotate(-40 15 15)"><rect x="3" y="10" width="24" height="10" rx="5" fill="#fff" stroke="#0F1217" stroke-width="1.6"/><path d="M15 10h7a5 5 0 0 1 0 10h-7z" fill="#2FBF71"/></g></svg>
+                <span><b>Pump</b><span class="mono">pump.fun</span></span>
+              </button>
+              <button type="button" class="venue" role="radio" aria-checked="false" data-venue="meteora">
+                <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="20" cy="10" r="6" fill="#FF5A1F"/><path d="M16 14 4 26M13 11 2 22M19 17 9 28" stroke="#0F1217" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <span><b>Meteora</b><span class="mono">dynamic pools</span></span>
+              </button>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="block">
+          <h3><span class="n">1</span>Token</h3>
+          <div class="row2">
+            <div class="field"><label for="tName">Name <span id="nameCt">0/32</span></label><input class="in" id="tName" maxlength="32" placeholder="Gigachad Cat"></div>
+            <div class="field"><label for="tSym">Symbol <span id="symCt">0/10</span></label><input class="in" id="tSym" maxlength="10" placeholder="GIGA" style="text-transform:uppercase"></div>
+          </div>
+          <div class="field" style="margin-top:18px">
+            <span class="lbl">Token image <span>required</span></span>
+            <label class="drop" id="drop" for="tImg">
+              <input type="file" id="tImg" accept="image/png,image/jpeg,image/gif,image/webp">
+              <span id="dropIdle">Choose or drop a token image</span>
+              <img id="dropImg" alt="" hidden>
+              <span class="fn" id="dropFn" hidden></span>
+            </label>
+            <p class="hintline" id="imgHint">PNG, JPEG, GIF or WebP · max 5 MB.</p>
+          </div>
+          <details class="social">
+            <summary>Social links <span>optional</span></summary>
+            <div class="social-grid">
+              <div class="field"><label for="sX">X</label><input class="in" id="sX" placeholder="x.com/yourtoken"></div>
+              <div class="field"><label for="sT">Telegram</label><input class="in" id="sT" placeholder="t.me/yourtoken"></div>
+              <div class="field"><label for="sW">Website</label><input class="in" id="sW" placeholder="yourtoken.xyz"></div>
+            </div>
+          </details>
+        </div>
+
+        <div class="block">
+          <h3><span class="n">2</span>Auction mode</h3>
+          <div class="modes" role="radiogroup" aria-label="Auction mode">
+            <button type="button" class="mode" role="radio" aria-checked="true" data-mode="degen">
+              <div class="top"><b>Degen</b></div><p>Cheap Slices, fast price discovery.</p>
+              <dl><dt>Start</dt><dd>1.5 SOL</dd><dt>Floor</dt><dd>0.5 SOL</dd><dt>Drop / 15s</dt><dd>0.125 SOL</dd></dl>
+            </button>
+            <button type="button" class="mode" role="radio" aria-checked="false" data-mode="builder">
+              <div class="top"><b>Builder</b></div><p>Premium Slices for launches with real backing.</p>
+              <dl><dt>Start</dt><dd>4 SOL</dd><dt>Floor</dt><dd>1 SOL</dd><dt>Drop / 15s</dt><dd>0.2 SOL</dd></dl>
+            </button>
+          </div>
+        </div>
+
+        <div class="block">
+          <h3><span class="n">3</span>Pre-buy Slices</h3>
+          <div class="stepper">
+            <div class="step-ctl"><button type="button" id="preMinus" aria-label="Fewer Slices">−</button><output id="preN" aria-live="polite">3</output><button type="button" id="prePlus" aria-label="More Slices">+</button></div>
+            <span class="hintline" style="margin:0">At the floor price · max 5. Keep a share of your own fee stream before the auction opens.</span>
+          </div>
+          <div class="preseg" id="preSeg" aria-hidden="true"></div>
+        </div>
+
+        <div class="block">
+          <h3>Dev buy</h3>
+          <div class="field">
+            <label for="dev">Buy your token · SOL <span>optional</span></label>
+            <input class="in" id="dev" inputmode="decimal" placeholder="0">
+          </div>
+          <div class="est"><span>Estimated tokens received</span><b id="devEst">~0 tokens</b></div>
+        </div>
+      </form>
+
+      <aside class="summary" aria-label="Launch summary">
+        <span class="preview-flag" id="netFlag">Preview build · no transactions sent</span>
+        <h3>Your launch</h3>
+        <dl class="sum-rows">
+          <div><dt>Venue</dt><dd id="sVenue">Pump</dd></div>
+          <div><dt>Mode</dt><dd id="sMode">Degen</dd></div>
+          <div><dt>Slices for auction</dt><dd id="sAuc">7 of 10</dd></div>
+          <div><dt>Pre-buy</dt><dd id="sPre">3 × 0.5</dd></div>
+          <div><dt>Dev buy</dt><dd id="sDev">0 SOL</dd></div>
+          <div><dt>Network costs</dt><dd>~0.04 SOL</dd></div>
+          <div class="total"><dt>Total, about</dt><dd id="sTotal">1.5 SOL</dd></div>
+        </dl>
+        <button class="btn solid lg" id="launchBtn" type="button">Launch token</button>
+        <p class="help" id="help"></p>
+        <ol class="progress" id="progress" hidden></ol>
+        <div class="done-box" id="doneBox" hidden></div>
+        <ol class="next">
+          <li>Image and metadata are uploaded.</li>
+          <li>The token is created on your venue.</li>
+          <li>Your pre-bought Slices are reserved.</li>
+          <li>The auction opens for the other Slices.</li>
+          <li>Creator fees stream to Slice holders.</li>
+        </ol>
+      </aside>
+    </div>
+  </section>
+
+  <footer>
+    <a class="brand" href="#top" style="font-size:1.3rem"><span>Slice</span></a>
+    <span>Ten Slices. One fee stream.</span>
+    <span class="mono">Built for Solana · Pump · Meteora</span>
+  </footer>
+</main>
+<div class="wrap docs" id="docsView" hidden>
+  <div class="docs-head">
+    <p class="eyebrow">Docs</p>
+    <h1 class="display">How Slices work.</h1>
+    <p>What a Slice is, how the auction prices it, what happens when you take one, and how fees reach you.</p>
+  </div>
+  <div class="docs-grid">
+    <nav class="dside" aria-label="Docs sections">
+      <span class="mono">On this page</span>
+      <a href="#docs-overview">Overview</a>
+      <a href="#docs-slices">What a Slice is</a>
+      <a href="#docs-auction">The auction</a>
+      <a href="#docs-take">Taking a Slice</a>
+      <a href="#docs-fees">Earning fees</a>
+      <a href="#docs-launch">Launching a token</a>
+      <a href="#docs-status">Terms</a>
+      <a href="#docs-faq">FAQ</a>
+    </nav>
+    <article class="dbody">
+      <section id="docs-overview" data-ds>
+        <h2>Overview</h2>
+        <p>Every token earns creator fees as it trades. Slices splits that stream into <strong>ten equal shares</strong> and sells them in a price-falling auction. If you hold a Slice, you earn one tenth of the creator fees for as long as the token trades.</p>
+        <p>The creator keeps the choice of how many Slices to hold from day one. Everyone else buys the rest at a price that starts high and steps down until someone takes it.</p>
+      </section>
+
+      <section id="docs-slices" data-ds>
+        <h2>What a Slice is</h2>
+        <p>A Slice is a numbered claim on a share of one token’s creator fees. Every launch has exactly ten, numbered 01 to 10, and each is worth 10% of the same stream.</p>
+        <div class="slices" aria-hidden="true"><i class="on">01</i><i class="on">02</i><i class="on">03</i><i>04</i><i>05</i><i>06</i><i>07</i><i>08</i><i>09</i><i>10</i></div>
+        <p style="font-size:.9rem;color:var(--mute)">Example: a creator who pre-bought three Slices holds 30% of the fee stream. Seven Slices go to auction.</p>
+        <table class="tbl"><thead><tr><th>State</th><th>Meaning</th></tr></thead><tbody>
+          <tr><td>Creator</td><td>Pre-bought by the token’s creator at the floor price, before the auction opened.</td></tr>
+          <tr><td>Open</td><td>Up for auction at the current price.</td></tr>
+          <tr><td>Yours</td><td>Held by your wallet. Fees for this Slice are credited to you.</td></tr>
+        </tbody></table>
+      </section>
+
+      <section id="docs-auction" data-ds>
+        <h2>The auction</h2>
+        <p>Open Slices are sold at a price that falls on a fixed schedule. Every 15 seconds the price drops by one step, until it reaches the floor. It stays at the floor until the Slice is taken.</p>
+        <div class="formula">price = max(<b>floor</b>, <b>start</b> − <b>drop</b> × ⌊seconds ÷ 15⌋)</div>
+        <p>For example, in Degen mode after 45 seconds the price is 1.5 − 0.125 × 3 = <strong>1.125 SOL</strong>.</p>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Mode</th><th>Start</th><th>Floor</th><th>Drop / 15s</th><th>Time to floor</th><th>Built for</th></tr></thead><tbody>
+          <tr><td>Degen</td><td>1.5 SOL</td><td>0.5 SOL</td><td>0.125 SOL</td><td>2 min</td><td>Cheap Slices, fast price discovery</td></tr>
+          <tr><td>Builder</td><td>4 SOL</td><td>1 SOL</td><td>0.2 SOL</td><td>3 min 45 s</td><td>Premium Slices for launches with real backing</td></tr>
+        </tbody></table></div>
+        <p>The creator picks the mode when launching. You can watch both schedules play out on the <a href="#how">chart on the home page</a>.</p>
+      </section>
+
+      <section id="docs-take" data-ds>
+        <h2>Taking a Slice</h2>
+        <p>Taking a Slice is one transaction that you sign in your wallet. It either completes in full or does not happen at all.</p>
+        <ol class="flow">
+          <li><div><h3>Choose an open Slice</h3><p>Pick a Slice that is open and check the price shown. The price keeps falling while you decide.</p></div></li>
+          <li><div><h3>Sign once</h3><p>Your wallet shows the Slice number and the most you are willing to pay. That limit is the price you saw when you clicked.</p></div></li>
+          <li><div><h3>The price is calculated at the moment of purchase</h3><p>The program works out the price from the auction’s start, floor, drop and elapsed time. It does not rely on what your screen displayed. If the result is above your limit, the transaction fails and you pay nothing.</p></div></li>
+          <li><div><h3>You pay and the Slice is assigned to you</h3><p>The price is taken from your wallet in SOL and the Slice is recorded against your address. If someone else took the same Slice a moment earlier, your transaction fails and your SOL stays put.</p></div></li>
+          <li><div><h3>You start earning</h3><p>From the next fees the token earns, one tenth is credited to you for this Slice.</p></div></li>
+        </ol>
+      </section>
+
+      <section id="docs-fees" data-ds>
+        <h2>Earning fees</h2>
+        <p>Taking a Slice does not pay you anything by itself. You earn from trading activity that happens afterwards.</p>
+        <p>Every launch has ten vaults, one per Slice, that only the Slices program can pay out from. The auction does not open until the program has checked on-chain that the token’s creator fees are wired to those vaults and can’t be changed.</p>
+        <p><strong>On Pump</strong>, the coin’s fee sharing is set to the ten vaults at 10% each. Pump locks that list permanently, so not even the creator can change it. <strong>On Meteora</strong>, the pool’s creator role is handed to the Slices program, which can only send the fees to the ten vaults.</p>
+        <p>To get paid, press <strong>Collect fees</strong>: it pays everything the token has earned so far into all ten vaults at once, and anyone can do it. Then <strong>Claim</strong> sends your vault’s balance to your wallet in SOL. Fees earned by a Slice before anyone buys it stay in its vault and go to whoever takes it.</p>
+        <p>More trading volume means more fees. A quiet token earns little, and a Slice has no guaranteed return.</p>
+      </section>
+
+      <section id="docs-launch" data-ds>
+        <h2>Launching a token</h2>
+        <p>Creators set the terms on the <a href="#launch">launch form</a> and sign once.</p>
+        <table class="tbl"><thead><tr><th>Setting</th><th>What it does</th></tr></thead><tbody>
+          <tr><td>Trading venue</td><td>Where the token trades: Pump (pump.fun) or Meteora.</td></tr>
+          <tr><td>Token</td><td>Name (up to 32 characters), symbol (up to 10) and an image of up to 5 MB.</td></tr>
+          <tr><td>Auction mode</td><td>Degen or Builder pricing, as in the table above.</td></tr>
+          <tr><td>Pre-buy Slices</td><td>0 to 5 Slices you keep before the public auction. Since the price would be paid to you, you only pay the 2% fee on the floor price.</td></tr>
+          <tr><td>Dev buy</td><td>Optional SOL spent on the token itself at launch, shown with an estimate of tokens received.</td></tr>
+        </tbody></table>
+        <p>The total you sign is <code>2% × pre-buy Slices × floor price + dev buy</code>, plus about 0.04 SOL of network rent for the new accounts. For example, three Degen pre-buys and a 0.2 SOL dev buy come to 0.03 + 0.2 + 0.04 ≈ <strong>0.27 SOL</strong>.</p>
+      </section>
+
+      <section id="docs-status" data-ds>
+        <h2>Terms</h2>
+        <div class="callout"><p><strong>Unaudited software.</strong> The Slices program has not had a security audit yet. Use small amounts, and check the network badge on the launch form before you sign.</p></div>
+        <table class="tbl"><thead><tr><th>Term</th><th>Rule</th></tr></thead><tbody>
+          <tr><td>Where Slice payments go</td><td>To the token’s creator, minus a 2% protocol fee</td></tr>
+          <tr><td>Pre-bought Slices</td><td>Creator pays the 2% fee on the floor price</td></tr>
+          <tr><td>Price after a Slice is taken</td><td>Restarts at the start price</td></tr>
+          <tr><td>Cut of the fee stream</td><td>None. Slices keep 100% of the creator fees</td></tr>
+          <tr><td>Transferring a Slice</td><td>Supported by the program; earnings move with it</td></tr>
+          <tr><td>Slices that never sell</td><td>Price stays at the floor; fees wait in the vault</td></tr>
+        </tbody></table>
+        <p>One thing outside Slices’ control: Pump and Meteora can change their own programs and fee rules, including Pump’s admin tools for fee sharing.</p>
+      </section>
+
+      <section id="docs-faq" data-ds class="faq">
+        <h2>FAQ</h2>
+        <details><summary>Can two people take the same Slice?</summary><p>No. Only the first transaction to land wins. The other fails in full and the SOL is not spent.</p></details>
+        <details><summary>What if the price drops after I click?</summary><p>You pay the price at the moment the transaction lands, never more than the limit you signed. If it is lower, you pay the lower price.</p></details>
+        <details><summary>What is the difference between Degen and Builder?</summary><p>Degen starts at 1.5 SOL and drops to a 0.5 SOL floor in two minutes. Builder starts at 4 SOL and drops to a 1 SOL floor in three minutes and forty-five seconds.</p></details>
+        <details><summary>Is a Slice guaranteed to earn money?</summary><p>No. Earnings depend on how much the token trades. A Slice can earn less than you paid for it.</p></details>
+        <details><summary>Do I have to press Collect fees?</summary><p>Fees build up on Pump or Meteora until someone collects them. Anyone can press Collect fees, and it pays all ten Slices at once. Then each holder claims their own share.</p></details>
+      </section>
+    </article>
+  </div>
+  <footer>
+    <a class="brand" href="#top" style="font-size:1.3rem"><span>Slice</span></a>
+    <span>Ten Slices. One fee stream.</span>
+    <span class="mono">Built for Solana · Pump · Meteora</span>
+  </footer>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script type="module" src="/src/main.ts"></script>
+<script>
+(() => {
+'use strict';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const pad = n => String(n).padStart(2, '0');
+const fmt = n => n.toFixed(3);
+const STEP = 15000;
+const MODES = {
+  degen:   { key: 'degen',   label: 'Degen',   start: 1.5, floor: 0.5, drop: 0.125 },
+  builder: { key: 'builder', label: 'Builder', start: 4,   floor: 1,   drop: 0.2 }
+};
+const priceAt = (m, ms) => Math.max(m.floor, +(m.start - m.drop * Math.floor(ms / STEP)).toFixed(4));
+const floorMs = m => Math.round((m.start - m.floor) / m.drop) * STEP;
+
+/* toast */
+let toastT;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* nav border on scroll */
+const nav = $('#nav');
+addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8), { passive: true });
+
+/* headline split */
+(function () {
+  const h = $('#h1'); const words = h.dataset.text.split(' ');
+  h.setAttribute('aria-label', h.dataset.text);
+  h.innerHTML = words.map((w, i) => {
+    const hot = w.startsWith('shared');
+    return `<span class="w" aria-hidden="true"><span style="--i:${i}"${hot ? ' class="hot"' : ''}>${w}</span></span>`;
+  }).join(' ');
+})();
+
+/* wallet */
+const wallet = { address: null };
+function walletProvider() { return (window.phantom && window.phantom.solana) || window.solana || window.solflare || null; }
+function paintWallet() {
+  const b = $('#walletBtn');
+  b.textContent = wallet.address ? wallet.address.slice(0, 4) + '…' + wallet.address.slice(-4) : 'Connect wallet';
+}
+const isLive = () => !!(window.StacksChain && window.StacksChain.live);
+function friendly(err) {
+  const m = String((err && (err.message || err)) || err);
+  if (/User rejected|rejected the request|cancel/i.test(m)) return 'Cancelled in your wallet.';
+  if (/PriceAboveMax|0x1780|6016/.test(m)) return 'The price moved before your transaction landed. Try again.';
+  if (/StackTaken|6015|0x177f/i.test(m)) return 'Someone took that Slice first. Pick another one.';
+  if (/insufficient lamports|insufficient funds|0x1\b/i.test(m)) return 'Not enough SOL in your wallet for this.';
+  if (/NothingToClaim|6018|0x1782/i.test(m)) return 'Nothing to claim yet. Collect fees first.';
+  return m.length > 160 ? m.slice(0, 160) + '…' : m;
+}
+async function connectWallet() {
+  if (isLive()) {
+    try { wallet.address = await window.StacksChain.connect(); paintWallet(); toast('Wallet connected'); return true; }
+    catch (e) { toast(friendly(e)); return false; }
+  }
+  const p = walletProvider();
+  if (!p) { toast('No Solana wallet found here. Open this page in a browser with Phantom or Solflare.'); return false; }
+  try {
+    const r = await p.connect();
+    wallet.address = (r && r.publicKey ? r.publicKey : p.publicKey).toString();
+    paintWallet(); toast('Wallet connected'); return true;
+  } catch (e) { toast('Wallet connection was cancelled.'); return false; }
+}
+$('#walletBtn').addEventListener('click', connectWallet);
+
+/* ================= HERO STATE ================= */
+const hero = {
+  mode: 'degen', t0: performance.now(), sel: 3,
+  owners: ['creator', 'creator', 'creator', null, null, null, null, null, null, null],
+  paid: Array(10).fill(0), earned: 0
+};
+let scene = null;
+
+const heroSeg = $('#heroSeg');
+for (let i = 0; i < 10; i++) {
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = pad(i + 1); b.dataset.i = i;
+  b.addEventListener('click', () => selectLot(i, true));
+  heroSeg.appendChild(b);
+}
+function selectLot(i, focus) {
+  hero.sel = i;
+  if (scene) scene.select(i, focus);
+  renderInspector(performance.now());
+}
+function renderInspector(now) {
+  const m = MODES[hero.mode]; const i = hero.sel; const o = hero.owners[i]; const el = now - hero.t0;
+  $$('button', heroSeg).forEach((b, k) => {
+    const ow = hero.owners[k];
+    b.className = (ow || '') + (k === i ? ' sel' : '');
+    b.setAttribute('aria-label', `Slice ${pad(k + 1)}, ${ow === 'creator' ? 'held by creator' : ow === 'you' ? 'yours' : 'open'}`);
+  });
+  $('#insLot').textContent = pad(i + 1);
+  const pill = $('#insPill');
+  pill.className = 'pill ' + (o === 'you' ? 'you' : o ? '' : 'open');
+  pill.textContent = o === 'you' ? 'Yours' : o === 'creator' ? 'Creator' : 'Open';
+  const take = $('#insTake'); const note = $('#insNote'); const bar = $('#insBar');
+  if (!o) {
+    const atFloor = el >= floorMs(m);
+    $('#insPrice').textContent = fmt(priceAt(m, el));
+    $('#insPriceLab').textContent = 'Price now';
+    bar.style.width = (atFloor ? 100 : (el % STEP) / STEP * 100) + '%';
+    note.textContent = atFloor ? `At the floor of ${m.floor} SOL. It stays here until someone takes a Slice.` : `Drops ${m.drop} SOL in ${Math.ceil((STEP - el % STEP) / 1000)}s. Floor is ${m.floor} SOL.`;
+    take.disabled = false; take.textContent = `Take Slice ${pad(i + 1)}`;
+  } else {
+    $('#insPrice').textContent = fmt(o === 'creator' ? m.floor : hero.paid[i]);
+    $('#insPriceLab').textContent = 'Paid';
+    bar.style.width = '100%';
+    note.textContent = o === 'creator' ? 'Pre-bought by the creator at the floor price.' : 'You hold one tenth of this token’s creator fees.';
+    take.disabled = true; take.textContent = o === 'you' ? 'You hold this Slice' : 'Taken';
+  }
+  const mine = hero.owners.includes('you');
+  $('#earned').hidden = !mine;
+  $('#earnedV').textContent = hero.earned.toFixed(4) + ' SOL';
+  $$('[data-hm]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.hm === hero.mode)));
+}
+$('#insTake').addEventListener('click', () => {
+  const i = hero.sel; if (hero.owners[i]) return;
+  const m = MODES[hero.mode]; const p = priceAt(m, performance.now() - hero.t0);
+  hero.owners[i] = 'you'; hero.paid[i] = p; hero.t0 = performance.now();
+  if (scene) scene.setOwner(i, 'you');
+  toast(`Slice ${pad(i + 1)} is yours at ${fmt(p)} SOL`);
+  const next = hero.owners.findIndex(x => !x);
+  if (next >= 0) selectLot(next, true); else renderInspector(performance.now());
+});
+$$('[data-hm]').forEach(b => b.addEventListener('click', () => { hero.mode = b.dataset.hm; hero.t0 = performance.now(); renderInspector(performance.now()); }));
+$('#insReset').addEventListener('click', () => {
+  hero.owners = ['creator', 'creator', 'creator', null, null, null, null, null, null, null];
+  hero.paid.fill(0); hero.earned = 0; hero.t0 = performance.now();
+  if (scene) scene.reset();
+  selectLot(3, true);
+});
+
+/* ================= 3D SCENE ================= */
+function initScene() {
+  const wrap = $('#glWrap'); const canvas = $('#gl');
+  if (!window.THREE) { wrap.classList.add('nogl'); return null; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); }
+  catch (e) { wrap.classList.add('nogl'); return null; }
+  renderer.setClearColor(0x000000, 0);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const sceneG = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  let dist = 15;
+
+  const C = { open: new THREE.Color(0xFFFFFF), creator: new THREE.Color(0x151922), you: new THREE.Color(0xFF5A1F) };
+  const ACC = 0xFF5A1F;
+
+  sceneG.add(new THREE.HemisphereLight(0xffffff, 0xd9dde6, 0.8));
+  const key = new THREE.DirectionalLight(0xffffff, 0.85);
+  key.position.set(-6, 11, 7); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  const sc = key.shadow.camera; sc.left = -7; sc.right = 7; sc.top = 7; sc.bottom = -7; sc.near = 1; sc.far = 32;
+  key.shadow.bias = -0.0004; key.shadow.radius = 5;
+  sceneG.add(key);
+
+  // floor platform
+  const floor = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 4.5, 0.24, 96), new THREE.MeshStandardMaterial({ color: 0xF0F1F4, roughness: 0.9 }));
+  floor.position.y = -0.5; floor.receiveShadow = true; sceneG.add(floor);
+
+  // the token: a hub in the middle of the slices
+  const R0 = 0.78, R1 = 3.55, H = 0.62, BASE = -0.3, TOP = BASE + H + 0.06;
+  const hub = new THREE.Group(); sceneG.add(hub);
+  const hubBody = new THREE.Mesh(new THREE.CylinderGeometry(R0 - 0.16, R0 - 0.16, H + 0.5, 64), new THREE.MeshStandardMaterial({ color: 0x151922, roughness: 0.35, metalness: 0.15 }));
+  hubBody.position.y = BASE + (H + 0.5) / 2; hubBody.castShadow = true; hub.add(hubBody);
+  const hubCap = new THREE.Mesh(new THREE.CylinderGeometry(R0 - 0.3, R0 - 0.3, 0.04, 64), new THREE.MeshStandardMaterial({ color: ACC, roughness: 0.5 }));
+  hubCap.position.y = BASE + H + 0.52; hub.add(hubCap);
+  const HUB_TOP = BASE + H + 0.55;
+
+  // slices: one wedge shape centred on angle 0, copied ten times
+  const SPAN = Math.PI * 2 / 10, GAP = 0.05;
+  const a0 = -SPAN / 2 + GAP / 2, a1 = SPAN / 2 - GAP / 2;
+  const wedge = new THREE.Shape();
+  wedge.moveTo(R0 * Math.cos(a0), R0 * Math.sin(a0));
+  wedge.lineTo(R1 * Math.cos(a0), R1 * Math.sin(a0));
+  wedge.absarc(0, 0, R1, a0, a1, false);
+  wedge.lineTo(R0 * Math.cos(a1), R0 * Math.sin(a1));
+  wedge.absarc(0, 0, R0, a1, a0, true);
+  const geo = new THREE.ExtrudeGeometry(wedge, { depth: H, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.05, bevelSegments: 4, curveSegments: 28 });
+  geo.rotateX(-Math.PI / 2); // extrude upward; the slice's middle points along +x
+  const planeGeo = new THREE.PlaneGeometry(1.15, 1.15);
+  const LABEL_R = (R0 + R1) / 2 + 0.35;
+  const ring = new THREE.Group(); sceneG.add(ring);
+  const slabs = [];
+  function paint(s) {
+    const c = s.cv, x = c.getContext('2d'), W = c.width;
+    x.clearRect(0, 0, W, W);
+    const dark = s.owner !== null;
+    x.textAlign = 'center';
+    x.fillStyle = dark ? '#FFFFFF' : '#0F1217'; x.font = '800 128px "Bricolage Grotesque", sans-serif'; x.fillText(pad(s.i + 1), W / 2, 150);
+    x.fillStyle = dark ? 'rgba(255,255,255,.75)' : 'rgba(15,18,23,.5)'; x.font = '500 30px "DM Mono", monospace';
+    x.fillText(s.owner === 'you' ? 'YOURS' : s.owner === 'creator' ? 'CREATOR' : '10% · OPEN', W / 2, 206);
+    s.tex.needsUpdate = true;
+  }
+  for (let i = 0; i < 10; i++) {
+    const g = new THREE.Group(); g.rotation.y = i * SPAN; ring.add(g);
+    const inner = new THREE.Group(); inner.position.y = BASE; g.add(inner);
+    const mat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.42, metalness: 0.02, emissive: new THREE.Color(ACC), emissiveIntensity: 0 });
+    const mesh = new THREE.Mesh(geo, mat); mesh.castShadow = true; mesh.receiveShadow = true; mesh.userData.i = i;
+    const cv = document.createElement('canvas'); cv.width = cv.height = 256;
+    const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 8;
+    const lm = new THREE.MeshBasicMaterial({ map: tex, transparent: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+    const lg = new THREE.Group(); lg.position.set(LABEL_R, H + 0.065, 0); lg.rotation.y = Math.PI / 2;
+    const label = new THREE.Mesh(planeGeo, lm); label.rotation.x = -Math.PI / 2; lg.add(label);
+    inner.add(mesh, lg);
+    slabs.push({ i, g, inner, lg, mesh, mat, cv, tex, owner: hero.owners[i], lift: 0, out: 0, pulse: 0 });
+  }
+  const paintAll = () => slabs.forEach(paint);
+  paintAll();
+  if (document.fonts && document.fonts.load) {
+    Promise.all([document.fonts.load('800 100px "Bricolage Grotesque"'), document.fonts.load('500 20px "DM Mono"')]).then(paintAll).catch(() => {});
+  }
+
+  // particles: fees flowing from the coin to held Slices
+  const pGeo = new THREE.SphereGeometry(0.07, 12, 12); const pMat = new THREE.MeshBasicMaterial({ color: ACC });
+  const parts = Array.from({ length: 18 }, () => {
+    const m = new THREE.Mesh(pGeo, pMat); m.visible = false; ring.add(m);
+    return { m, t: Math.random(), spd: 0.28 + Math.random() * 0.25, tgt: -1 };
+  });
+  const P0 = new THREE.Vector3(0, HUB_TOP, 0), P1 = new THREE.Vector3(), P2 = new THREE.Vector3();
+  function pickTarget() {
+    const owned = slabs.filter(s => s.owner); if (!owned.length) return -1;
+    return owned[Math.floor(Math.random() * owned.length)].i;
+  }
+
+  // interaction
+  const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2();
+  let rot = -Math.PI / 2 - 3 * (Math.PI * 2 / 10), vel = 0, dragging = false, moved = 0, lastX = 0, idle = 0, focusT = null;
+  let hoverI = -1, selI = hero.sel, px = 0;
+  function setNdc(e) { const r = canvas.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); px = ndc.x; }
+  function pick() {
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(slabs.map(s => s.mesh), false)[0];
+    hoverI = hit ? hit.object.userData.i : -1;
+    canvas.style.cursor = dragging ? 'grabbing' : hoverI >= 0 ? 'pointer' : 'grab';
+  }
+  canvas.addEventListener('pointerdown', e => { dragging = true; moved = 0; lastX = e.clientX; vel = 0; focusT = null; try { canvas.setPointerCapture(e.pointerId); } catch (_) {} canvas.style.cursor = 'grabbing'; });
+  canvas.addEventListener('pointermove', e => {
+    setNdc(e);
+    if (dragging) { const dx = e.clientX - lastX; lastX = e.clientX; moved += Math.abs(dx); rot += dx * 0.0075; vel = dx * 0.45; idle = 0; }
+    else pick();
+  });
+  canvas.addEventListener('pointerup', e => {
+    setNdc(e); dragging = false; pick();
+    if (moved < 6 && hoverI >= 0) selectLot(hoverI, true);
+  });
+  canvas.addEventListener('pointercancel', () => { dragging = false; });
+  canvas.addEventListener('pointerleave', () => { if (!dragging) { hoverI = -1; canvas.style.cursor = 'grab'; } });
+  canvas.style.cursor = 'grab';
+
+  function resize() {
+    const r = wrap.getBoundingClientRect(); if (!r.width || !r.height) return;
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    dist = 14 / Math.min(1, camera.aspect / 1.2);
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(wrap); resize();
+
+  let last = performance.now(), time = 0;
+  function step(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
+    // rotation
+    if (!dragging) {
+      rot += vel * dt; vel *= Math.pow(0.02, dt); idle += dt;
+      if (!reduce && idle > 2.5 && focusT === null) rot += dt * 0.14;
+    }
+    if (focusT !== null) {
+      const TAU = Math.PI * 2; let d = (((focusT - rot + Math.PI) % TAU) + TAU) % TAU - Math.PI;
+      rot += d * Math.min(1, dt * 4); idle = 0; if (Math.abs(d) < 0.003) focusT = null;
+    }
+    ring.rotation.y = rot;
+    // camera
+    const el = 0.68 + (reduce ? 0 : -px * 0.02);
+    camera.position.set(px * 0.5, Math.sin(el) * dist, Math.cos(el) * dist);
+    camera.lookAt(0, -0.1, 0);
+    hubCap.scale.setScalar(1 + (reduce ? 0 : Math.sin(time * 2) * 0.04));
+    // slices: hover and selection pull a slice out of the disc
+    const k = Math.min(1, dt * 9);
+    for (const s of slabs) {
+      const hov = hoverI === s.i ? 1 : 0, sel = selI === s.i ? 1 : 0;
+      s.out += ((hov * 0.22 + sel * 0.62) - s.out) * k;
+      s.lift += ((hov * 0.08 + sel * 0.22) - s.lift) * k;
+      s.inner.position.x = s.out;
+      s.lg.rotation.y = -(rot + s.i * SPAN); // keep every number upright for the viewer
+      s.inner.position.y = BASE + s.lift + (reduce ? 0 : Math.sin(time * 1.1 + s.i * 0.9) * 0.02);
+      s.mat.color.lerp(C[s.owner || 'open'], Math.min(1, dt * 7));
+      s.pulse = Math.max(0, s.pulse - dt * 2.2); s.mat.emissiveIntensity = s.pulse * 0.5;
+    }
+    // particles
+    for (const p of parts) {
+      if (p.tgt < 0 || p.t >= 1) {
+        if (p.tgt >= 0 && p.t >= 1) arrive(p.tgt);
+        p.tgt = pickTarget(); p.t = 0; p.spd = 0.28 + Math.random() * 0.25;
+      }
+      if (p.tgt < 0) { p.m.visible = false; continue; }
+      p.m.visible = true; p.t += (reduce ? 0.04 : p.spd) * dt;
+      const s = slabs[p.tgt], th = s.i * SPAN, d = LABEL_R + s.out;
+      P2.set(Math.cos(th) * d, s.inner.position.y + H + 0.15, -Math.sin(th) * d);
+      P1.set(P2.x * 0.45, 3.2, P2.z * 0.45);
+      const t = Math.min(p.t, 1), u = 1 - t;
+      p.m.position.set(u * u * P0.x + 2 * u * t * P1.x + t * t * P2.x, u * u * P0.y + 2 * u * t * P1.y + t * t * P2.y, u * u * P0.z + 2 * u * t * P1.z + t * t * P2.z);
+      p.m.scale.setScalar(0.5 + Math.sin(Math.PI * t) * 0.8);
+    }
+    renderer.render(sceneG, camera);
+  }
+  function arrive(i) {
+    const s = slabs[i]; if (!s) return; s.pulse = 1;
+    if (s.owner === 'you') { hero.earned += 0.0006; }
+  }
+
+  let running = false, raf = 0;
+  function loop(now) { if (!running) return; raf = requestAnimationFrame(loop); step(now); }
+  new IntersectionObserver(es => {
+    const v = es[0].isIntersecting;
+    if (v && !running) { running = true; last = performance.now(); raf = requestAnimationFrame(loop); }
+    else if (!v) { running = false; cancelAnimationFrame(raf); }
+  }).observe(canvas);
+  step(performance.now());
+
+  return {
+    setOwner(i, o) { slabs[i].owner = o; paint(slabs[i]); slabs[i].pulse = 1; },
+    select(i, focus) { selI = i; if (focus) { focusT = -Math.PI / 2 - i * SPAN; } },
+    reset() { slabs.forEach(s => { s.owner = hero.owners[s.i]; paint(s); }); }
+  };
+}
+scene = initScene();
+selectLot(3, false);
+
+/* ================= AUCTION CHART ================= */
+(function () {
+  const svg = $('#chart'); const NS = 'http://www.w3.org/2000/svg';
+  const W = 640, H = 300, L = 46, Rr = 18, T = 16, B = 34, TMAX = 240, VMAX = 4.5;
+  const X = t => L + t / TMAX * (W - L - Rr), Y = v => T + (1 - v / VMAX) * (H - T - B);
+  let mode = 'degen', speed = 1, c0 = performance.now(), dot, vis = false;
+  const mk = (n, a, txt) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; return e; };
+  function stair(m) {
+    const n = Math.round((m.start - m.floor) / m.drop); let d = `M${X(0)} ${Y(m.start)}`;
+    for (let k = 1; k <= n; k++) d += ` H${X(k * 15)} V${Y(m.start - k * m.drop)}`;
+    return d + ` H${X(TMAX)}`;
+  }
+  function build() {
+    svg.innerHTML = '';
+    for (let v = 0; v <= 4; v++) {
+      svg.appendChild(mk('line', { class: 'grid', x1: L, x2: W - Rr, y1: Y(v), y2: Y(v) }));
+      svg.appendChild(mk('text', { x: L - 10, y: Y(v) + 4, 'text-anchor': 'end' }, String(v)));
+    }
+    [0, 60, 120, 180, 240].forEach(t => svg.appendChild(mk('text', { x: X(t), y: H - 10, 'text-anchor': t === 240 ? 'end' : t === 0 ? 'start' : 'middle' }, t + 's')));
+    svg.appendChild(mk('line', { class: 'axis', x1: L, x2: W - Rr, y1: Y(0), y2: Y(0) }));
+    ['builder', 'degen'].forEach(k => {
+      const m = MODES[k];
+      svg.appendChild(mk('path', { class: `st ${k}${k === mode ? '' : ' dim'}`, d: stair(m) }));
+      svg.appendChild(mk('text', { class: `tag ${k}`, x: X(TMAX) - 4, y: Y(m.floor) - 9, 'text-anchor': 'end', opacity: k === mode ? 1 : 0.4 }, m.label));
+    });
+    const m = MODES[mode], tf = floorMs(m) / 1000;
+    svg.appendChild(mk('line', { class: 'floor', x1: X(tf), x2: X(tf), y1: Y(m.floor), y2: Y(0) }));
+    svg.appendChild(mk('text', { x: X(tf) + (tf > 200 ? -6 : 6), y: Y(0) - 8, 'text-anchor': tf > 200 ? 'end' : 'start' }, `floor ${tf}s`));
+    dot = mk('circle', { r: 6.5, fill: mode === 'degen' ? '#FF5A1F' : '#0F1217', stroke: '#fff', 'stroke-width': 2.5 });
+    svg.appendChild(dot);
+  }
+  function tick(now) {
+    const m = MODES[mode]; const t = ((now - c0) / 1000 * speed) % TMAX; const p = priceAt(m, t * 1000);
+    dot.setAttribute('cx', X(t)); dot.setAttribute('cy', Y(p));
+    const tf = floorMs(m) / 1000;
+    $('#chartRead').textContent = `t = ${String(Math.floor(t)).padStart(3, ' ')}s · ${fmt(p)} SOL · ` + (t >= tf ? 'at floor' : `next drop in ${Math.ceil(15 - t % 15)}s`);
+  }
+  $$('[data-cm]').forEach(b => b.addEventListener('click', () => { mode = b.dataset.cm; c0 = performance.now(); $$('[data-cm]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); build(); }));
+  $$('[data-sp]').forEach(b => b.addEventListener('click', () => { speed = +b.dataset.sp; c0 = performance.now(); $$('[data-sp]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); }));
+  build(); tick(performance.now());
+  new IntersectionObserver(es => { vis = es[0].isIntersecting; }).observe(svg);
+  window.__chartTick = now => { if (vis) tick(now); };
+})();
+
+/* ================= LAUNCHES ================= */
+const SAMPLE = [
+  { name: 'Pocket Rocket', sym: 'ROCK', venue: 'Pump', mode: 'degen', sold: 4, hue: '#FFD9CC' },
+  { name: 'Slow Mail', sym: 'SNAIL', venue: 'Pump', mode: 'degen', sold: 7, hue: '#DDE6FF' },
+  { name: 'Night Bus', sym: 'NBUS', venue: 'Meteora', mode: 'builder', sold: 2, hue: '#D9F2E6' },
+  { name: 'Tin Frog', sym: 'TINF', venue: 'Pump', mode: 'degen', sold: 9, hue: '#F2E3FF' },
+  { name: 'Paper Moon', sym: 'PAPR', venue: 'Meteora', mode: 'builder', sold: 5, hue: '#FFF0C9' },
+  { name: 'Cold Brew', sym: 'BREW', venue: 'Pump', mode: 'degen', sold: 1, hue: '#E5E7EB' },
+  { name: 'Harbor Light', sym: 'HRBR', venue: 'Meteora', mode: 'builder', sold: 10, hue: '#D9F2E6' },
+  { name: 'Quiet Riot', sym: 'RIOT', venue: 'Pump', mode: 'degen', sold: 10, hue: '#FFD9CC' }
+];
+let launches = SAMPLE.map((l, i) => ({ ...l, id: i, t0: performance.now() - ((i * 13700) % 100000) }));
+let tab = 'top';
+const TABS = [
+  ['top', 'Top launches', ls => [...ls].sort((a, b) => b.sold - a.sold)],
+  ['all', 'All launches', ls => ls],
+  ['live', 'Live auctions', ls => ls.filter(l => l.sold < 10)],
+  ['migrating', 'Migrating', () => []],
+  ['earning', 'Earning', ls => ls.filter(l => l.sold === 10)],
+  ['swept', 'Swept', () => []]
+];
+function renderTabs() {
+  $('#tabs').innerHTML = TABS.map(([k, label, f]) => `<button class="tab" role="tab" type="button" data-tab="${k}" aria-selected="${k === tab}">${label}<span>${pad(f(launches).length)}</span></button>`).join('');
+}
+function cardHTML(l) {
+  const full = l.sold === 10;
+  const slices = Array.from({ length: 10 }, (_, k) => `<i class="${k < l.sold ? 'on' : ''}"></i>`).join('');
+  return `<article class="card" data-id="${l.id}">
+    <div class="c-head"><span class="av" style="background:${l.hue}">${l.image ? `<img src="${esc(l.image)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">` : esc((l.sym || '?')[0])}</span>
+      <div style="min-width:0"><h3>${esc(l.name)}</h3><span class="mono">$${esc(l.sym)} · ${l.venue}</span></div>
+      <span class="pill">${MODES[l.mode].label}</span></div>
+    <div class="slices" aria-hidden="true">${slices}</div>
+    <div class="c-meta"><span>${full ? 'All ten Slices taken' : `${l.sold} of 10 Slices taken`}</span><span>${full ? 'Earning' : `${10 - l.sold} left`}</span></div>
+    ${full ? '' : `<div class="c-px"><b data-px>—</b><small>SOL</small><span class="t" data-t></span></div><div class="bar"><i data-bar></i></div>`}
+    <button class="btn ${full ? 'ghost' : 'solid'}" type="button" data-take ${full ? 'disabled' : ''}>${full ? 'Fees are streaming' : 'Take a Slice'}</button>
+  </article>`;
+}
+function renderGrid(animate) {
+  const f = TABS.find(t => t[0] === tab)[2]; const list = f(launches);
+  const grid = $('#grid');
+  grid.innerHTML = list.length ? list.map(cardHTML).join('') : `<div class="empty">No launches here yet.</div>`;
+  if (animate && !reduce) $$('.card, .empty', grid).forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: i * 55, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }));
+  updateCards(performance.now());
+}
+function updateCards(now) {
+  $$('#grid .card').forEach(c => {
+    const l = launches[+c.dataset.id]; if (l.sold === 10) return;
+    const m = MODES[l.mode]; const el = now - l.t0; const px = c.querySelector('[data-px]');
+    if (!px) return;
+    const v = fmt(priceAt(m, el)); if (px.textContent !== v) px.textContent = v;
+    const atFloor = el >= floorMs(m);
+    const t = atFloor ? 'at floor' : `drop in ${Math.ceil((STEP - el % STEP) / 1000)}s`;
+    const te = c.querySelector('[data-t]'); if (te.textContent !== t) te.textContent = t;
+    c.querySelector('[data-bar]').style.width = (atFloor ? 100 : (el % STEP) / STEP * 100) + '%';
+  });
+}
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-tab]'); if (!b) return;
+  tab = b.dataset.tab; renderTabs(); renderGrid(true);
+});
+$('#grid').addEventListener('click', e => {
+  const b = e.target.closest('[data-take]'); if (!b || b.disabled) return;
+  const card = b.closest('.card'); const l = launches[+card.dataset.id];
+  if (l.live) {
+    const price = window.StacksChain.priceNow(l.mint) ?? priceAt(MODES[l.mode], performance.now() - l.t0);
+    const old = b.textContent; b.disabled = true; b.textContent = 'Confirm in your wallet…';
+    window.StacksChain.take(l.mint, l.nextIndex, price)
+      .then(() => toast(`Slice ${pad(l.nextIndex + 1)} of $${l.sym} is yours at ${fmt(price)} SOL`))
+      .catch(err => toast(friendly(err)))
+      .finally(() => { b.disabled = false; b.textContent = old; });
+    return;
+  }
+  const p = priceAt(MODES[l.mode], performance.now() - l.t0);
+  l.sold += 1; l.t0 = performance.now();
+  toast(`Took Slice ${pad(l.sold)} of $${l.sym} at ${fmt(p)} SOL`);
+  if (l.sold === 10) { renderTabs(); renderGrid(false); return; }
+  const lotsEls = $$('.slices i', card); lotsEls[l.sold - 1].className = 'on new';
+  $$('.c-meta span', card)[0].textContent = `${l.sold} of 10 Slices taken`; $$('.c-meta span', card)[1].textContent = `${10 - l.sold} left`;
+  card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); renderTabs();
+});
+$('#grid').addEventListener('pointermove', e => {
+  if (reduce || e.pointerType === 'touch') return;
+  const c = e.target.closest('.card'); if (!c) return;
+  const r = c.getBoundingClientRect();
+  c.style.setProperty('--ry', ((e.clientX - r.left) / r.width - 0.5) * 7 + 'deg');
+  c.style.setProperty('--rx', (0.5 - (e.clientY - r.top) / r.height) * 7 + 'deg');
+});
+$('#grid').addEventListener('pointerout', e => { const c = e.target.closest('.card'); if (c) { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); } });
+renderTabs(); renderGrid(false);
+
+/* ================= LIVE (on-chain) HOOKS ================= */
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function netName() { return window.StacksChain && window.StacksChain.cluster === 'mainnet-beta' ? 'Solana' : 'Solana devnet'; }
+window.StacksUI = {
+  toast,
+  setLaunches(list) {
+    launches = list.map((l, i) => ({ ...l, id: i }));
+    $('#gridNote').textContent = `Live on ${netName()}. Prices drop every 15 seconds and restart after each take. Taking a Slice sends one transaction from your wallet.`;
+    renderTabs(); renderGrid(false);
+  },
+  renderMine(rows) {
+    const box = $('#mineList');
+    if (rows === null) { box.innerHTML = `<div class="empty">Connect your wallet to see the Slices you hold.</div>`; return; }
+    if (!rows.length) { box.innerHTML = `<div class="empty">You don’t hold any Slices yet. Take one above.</div>`; return; }
+    box.innerHTML = rows.map(r => `<div class="mine-row" data-mint="${esc(r.mint)}" data-index="${r.index}">
+      <div style="min-width:0"><b>$${esc(r.sym)} · Slice ${pad(r.index + 1)}</b><span class="mono">${esc(r.name)} · ${esc(r.venue)}</span></div>
+      <div class="mine-amt"><b>${r.claimable.toFixed(4)}</b><small> SOL ready</small></div>
+      <div class="mine-act"><button class="btn ghost" type="button" data-collect>Collect fees</button><button class="btn solid" type="button" data-claim ${r.claimable > 0 ? '' : 'disabled'}>Claim</button></div>
+    </div>`).join('');
+  }
+};
+$('#mineList').addEventListener('click', e => {
+  const b = e.target.closest('[data-claim],[data-collect]'); if (!b || b.disabled) return;
+  const row = b.closest('.mine-row'); const mint = row.dataset.mint, index = +row.dataset.index;
+  const old = b.textContent; b.disabled = true; b.textContent = 'Confirm in wallet…';
+  const job = b.hasAttribute('data-claim') ? window.StacksChain.claim(mint, index) : window.StacksChain.collectFees(mint);
+  job.then(() => toast(b.hasAttribute('data-claim') ? 'Claimed to your wallet' : 'Fees paid into all ten Slices'))
+    .catch(err => toast(friendly(err)))
+    .finally(() => { b.disabled = false; b.textContent = old; });
+});
+$('#mineConnect').addEventListener('click', connectWallet);
+function onChainReady() {
+  if (!isLive()) return;
+  document.documentElement.classList.add('is-live');
+  $('#netFlag').textContent = netName();
+  $('#mine').hidden = false;
+  window.StacksUI.renderMine(null);
+}
+if (window.StacksChain) onChainReady(); else window.addEventListener('stacks:ready', onChainReady);
+
+/* ================= LAUNCH FORM ================= */
+(function () {
+  const f = { venue: 'pump', mode: 'degen', pre: 3, img: null };
+  const venueName = () => f.venue === 'pump' ? 'Pump' : 'Meteora';
+  const nameI = $('#tName'), symI = $('#tSym'), dev = $('#dev');
+  const seg = $('#preSeg');
+  for (let i = 1; i <= 10; i++) { const s = document.createElement('span'); s.textContent = pad(i); seg.appendChild(s); }
+
+  function devVal() { const v = parseFloat(String(dev.value).replace(',', '.')); return isFinite(v) && v > 0 ? v : 0; }
+  function missing() {
+    const m = []; if (!nameI.value.trim()) m.push('a token name'); if (!symI.value.trim()) m.push('a symbol'); if (!f.img) m.push('a token image'); return m;
+  }
+  function render() {
+    const m = MODES[f.mode];
+    $$('.venue').forEach(b => b.setAttribute('aria-checked', String(b.dataset.venue === f.venue)));
+    $$('.mode').forEach(b => b.setAttribute('aria-checked', String(b.dataset.mode === f.mode)));
+    $('#preN').textContent = f.pre;
+    $$('span', seg).forEach((s, k) => { const n = k + 1; s.className = n <= f.pre ? 'pre' : n <= 5 ? 'avail' : ''; });
+    $('#nameCt').textContent = nameI.value.length + '/32'; $('#symCt').textContent = symI.value.length + '/10';
+    const d = devVal(); const tokens = d * 1073e6 / (30 + d);
+    $('#devEst').textContent = '~' + (tokens ? new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(tokens) : '0') + ' tokens';
+    // Pre-bought Slices cost only the 2% protocol fee: the floor price would be paid to yourself.
+    const preFee = +(f.pre * m.floor * 0.02).toFixed(4); const network = 0.04;
+    const total = +(preFee + d + network).toFixed(3);
+    $('#sVenue').textContent = venueName(); $('#sMode').textContent = m.label;
+    $('#sAuc').textContent = `${10 - f.pre} of 10`; $('#sPre').textContent = f.pre ? `${f.pre} · ${preFee} SOL fee` : 'None';
+    $('#sDev').textContent = `${d} SOL`; $('#sTotal').textContent = `${total} SOL`;
+    const miss = missing();
+    $('#help').textContent = miss.length ? `Add ${miss.join(', ').replace(/, ([^,]*)$/, ' and $1')} to continue.` : 'Ready. Review the total, then launch.';
+  }
+  $$('.venue').forEach(b => b.addEventListener('click', () => { f.venue = b.dataset.venue; render(); }));
+  $$('.mode').forEach(b => b.addEventListener('click', () => { f.mode = b.dataset.mode; render(); }));
+  $('#preMinus').addEventListener('click', () => { f.pre = Math.max(0, f.pre - 1); render(); });
+  $('#prePlus').addEventListener('click', () => { f.pre = Math.min(5, f.pre + 1); render(); });
+  [nameI, symI, dev].forEach(i => i.addEventListener('input', () => {
+    if (i === symI) i.value = i.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (i === dev) i.value = i.value.replace(/[^0-9.,]/g, '');
+    render();
+  }));
+
+  // image
+  const drop = $('#drop'), file = $('#tImg');
+  function setFile(fl) {
+    const hint = $('#imgHint');
+    if (!fl) return;
+    if (!/^image\/(png|jpeg|gif|webp)$/.test(fl.type)) { hint.textContent = 'That file type is not supported. Use PNG, JPEG, GIF or WebP.'; hint.className = 'hintline err'; return; }
+    if (fl.size > 5 * 1024 * 1024) { hint.textContent = 'That image is over 5 MB. Choose a smaller one.'; hint.className = 'hintline err'; return; }
+    f.img = fl; hint.className = 'hintline'; hint.textContent = 'Uploaded when you launch.';
+    const im = $('#dropImg'); try { if (im.dataset.u) URL.revokeObjectURL(im.dataset.u); const u = URL.createObjectURL(fl); im.dataset.u = u; im.src = u; } catch (e) {}
+    im.hidden = false; $('#dropIdle').hidden = true; const fn = $('#dropFn'); fn.hidden = false; fn.textContent = fl.name; render();
+  }
+  file.addEventListener('change', () => setFile(file.files[0]));
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => setFile(e.dataTransfer.files[0]));
+
+  // launch
+  let busy = false;
+  const btn = $('#launchBtn');
+  btn.addEventListener('click', async () => {
+    if (busy) return;
+    const miss = missing();
+    if (miss.length) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast('Add ' + miss.join(', ').replace(/, ([^,]*)$/, ' and $1') + ' first.'); return; }
+    if (isLive()) return liveLaunch();
+    if (walletProvider() && !wallet.address) { const ok = await connectWallet(); if (!ok) return; }
+    busy = true; btn.disabled = true; $('#doneBox').hidden = true;
+    const sym = symI.value || 'TOKEN';
+    const labels = [`Uploading ${f.img.name}`, `Creating $${sym} on ${venueName()}`, f.pre ? `Reserving ${f.pre} Slice${f.pre > 1 ? 's' : ''} for you` : 'No pre-buy, skipping reservation', 'Opening the auction'];
+    const ol = $('#progress'); ol.hidden = false; ol.innerHTML = labels.map(l => `<li><i></i>${l}</li>`).join('');
+    const items = $$('li', ol);
+    for (let i = 0; i < items.length; i++) {
+      items[i].className = 'run'; await new Promise(r => setTimeout(r, 750)); items[i].className = 'done';
+    }
+    const box = $('#doneBox'); box.hidden = false;
+    box.innerHTML = `<b>Preview complete.</b> $${sym} on ${venueName()} with ${10 - f.pre} Slices up for auction. This build does not send transactions, so nothing was created on-chain yet.`;
+    busy = false; btn.disabled = false; toast('Launch preview complete');
+  });
+
+  async function liveLaunch() {
+    if (!wallet.address) { const ok = await connectWallet(); if (!ok) return; }
+    busy = true; btn.disabled = true; $('#doneBox').hidden = true;
+    const sym = symI.value;
+    const labels = f.venue === 'pump'
+      ? ['Uploading the image and metadata', `Creating $${sym} on Pump`, 'Registering the Slices and turning on fee sharing', 'Locking fees to the ten Slices and opening the auction']
+      : ['Uploading the image and metadata', `Creating $${sym} on Meteora`, 'Handing creator fees to the Slices and opening the auction'];
+    const ol = $('#progress'); ol.hidden = false; ol.innerHTML = labels.map(l => `<li><i></i>${l}</li>`).join('');
+    const items = $$('li', ol);
+    const step = i => items.forEach((li, k) => { li.className = k < i ? 'done' : k === i ? 'run' : ''; });
+    $('#help').textContent = 'Your wallet will ask you to approve all transactions at once.';
+    try {
+      const r = await window.StacksChain.launch({
+        venue: f.venue, name: nameI.value.trim(), symbol: sym, image: f.img,
+        twitter: $('#sX').value.trim(), telegram: $('#sT').value.trim(), website: $('#sW').value.trim(),
+        mode: f.mode, prebuy: f.pre, devBuySol: devVal()
+      }, i => step(i));
+      step(items.length);
+      const box = $('#doneBox'); box.hidden = false;
+      box.innerHTML = `<b>$${esc(sym)} is live.</b> ${10 - f.pre} Slices are up for auction on ${venueName()}. <a href="${r.explorer}" target="_blank" rel="noopener">View the transaction</a>. Mint: <span class="mono" style="text-transform:none;word-break:break-all">${esc(r.mint)}</span>`;
+      toast('Launched');
+    } catch (err) {
+      items.forEach(li => { if (li.className === 'run') li.className = ''; });
+      $('#help').innerHTML = `<span class="err">${esc(friendly(err))}</span>`;
+      toast(friendly(err));
+    } finally { busy = false; btn.disabled = false; }
+  }
+  render();
+})();
+
+/* ================= DOCS ROUTING ================= */
+(function () {
+  const main = $('#top'), docs = $('#docsView'); const links = $$('.dside a');
+  let wasDocs = false;
+  function show() {
+    const h = decodeURIComponent(location.hash.slice(1));
+    const isDocs = h === 'docs' || h.startsWith('docs-');
+    main.hidden = isDocs; docs.hidden = !isDocs;
+    requestAnimationFrame(() => {
+      const el = h && h !== 'docs' ? document.getElementById(h) : null;
+      if (el) el.scrollIntoView(); else if (isDocs || wasDocs || !h) scrollTo(0, 0);
+      wasDocs = isDocs;
+    });
+    links.forEach((a, i) => a.classList.toggle('on', a.getAttribute('href') === '#' + h || (h === 'docs' && i === 0)));
+  }
+  addEventListener('hashchange', show);
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id)); });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  $$('[data-ds]').forEach(s => io.observe(s));
+  show();
+})();
+
+/* ================= TICKER ================= */
+let lastUI = 0;
+function tick(now) {
+  requestAnimationFrame(tick);
+  if (window.__chartTick) window.__chartTick(now);
+  if (now - lastUI > 120) { lastUI = now; renderInspector(now); updateCards(now); }
+}
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
