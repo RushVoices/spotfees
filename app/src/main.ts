@@ -1,5 +1,5 @@
-// Connects the page (index.html) to Solana. The page's own script handles the
-// look and animations; this module exposes `window.StacksChain` with the real
+// Connects the page (index.html) to Solana. src/ui/site.ts handles the look
+// and animations; this module exposes `window.StacksChain` with the real
 // actions and, when the site is configured (see .env.example), swaps the
 // sample launches for the ones on chain.
 
@@ -11,7 +11,7 @@ import { getTokenMetadata, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { env, isLive } from "./chain/config";
 import { connectWallet, signAndSendSequential, walletKey } from "./chain/wallet";
 import {
-  Mode, Status, Venue, fetchAllLaunches, fetchClaimable, ixClaim, ixTakeStack, priceAt, type LaunchState,
+  Mode, Status, Venue, fetchAllLaunches, fetchClaimable, ixClaim, ixTakeStack, ixTransferStack, priceAt, type LaunchState,
 } from "./chain/stacks";
 import { launchOnPump, finishPumpSetup, collectPumpFees } from "./chain/pump";
 import { launchOnMeteora, harvestMeteoraFees } from "./chain/meteora";
@@ -83,7 +83,7 @@ export interface CardView {
   t0: number;
 }
 
-const HUES = ["#FFD9CC", "#DDE6FF", "#D9F2E6", "#F2E3FF", "#FFF0C9", "#E5E7EB"];
+const HUES = ["#d9f7e8", "#e8f6c9", "#cdf3e2", "#e2f3ea", "#f0f7d8", "#d6f0ff"];
 let launches: LaunchState[] = [];
 let chainOffset = 0; // chain unix time - local unix time, in seconds
 
@@ -213,6 +213,16 @@ const api = {
       : await harvestMeteoraFees(c, me, l.mint, l.venueAccount);
     await refreshMine();
     return sigs;
+  },
+
+  /** Moves Stack `index` (and its unclaimed SOL) to another wallet. */
+  async transfer(mint: string, index: number, to: string) {
+    const c = need();
+    const me = walletKey() ?? (await connectWallet());
+    const newOwner = new PublicKey(to);
+    const [sig] = await signAndSendSequential(c, [new Transaction().add(ixTransferStack(me, new PublicKey(mint), index, newOwner))]);
+    await refresh();
+    return { signature: sig, explorer: explorer(sig) };
   },
 
   async claim(mint: string, index: number) {

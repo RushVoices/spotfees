@@ -13,10 +13,12 @@
 // Pump SDK calls follow Pump's public docs:
 // https://github.com/pump-fun/pump-public-docs/blob/main/docs/instructions/CREATOR_FEE_SHARING.md
 
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { ComputeBudgetProgram, Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import BN from "bn.js";
-import { PUMP_SDK, OnlinePumpSdk, feeSharingConfigPda } from "@pump-fun/pump-sdk";
+import {
+  PUMP_SDK, OnlinePumpSdk, feeSharingConfigPda, getBuyTokenAmountFromSolAmount, type FeeConfig, type Global,
+} from "@pump-fun/pump-sdk";
 import {
   Mode, Venue, ixCreateLaunch, ixOpenAuctionPump, pumpBondingCurvePda, pumpSharingConfigPda,
   vaultPdas, fetchLaunch, Status, PUMP_FEES_PROGRAM_ID,
@@ -26,6 +28,7 @@ import { signAndSendSequential } from "./wallet";
 
 const toIxs = (x: TransactionInstruction | TransactionInstruction[]) => (Array.isArray(x) ? x : [x]);
 const txOf = (ixs: TransactionInstruction[]) => new Transaction().add(...ixs);
+const cu = (units: number) => ComputeBudgetProgram.setComputeUnitLimit({ units });
 
 export interface LaunchParams {
   name: string;
@@ -36,18 +39,31 @@ export interface LaunchParams {
   devBuyLamports: bigint;
 }
 
-/** Rough token amount for a SOL dev buy on a fresh curve, with a 3% cushion for fees. */
-function estimateTokensOut(global: unknown, lamportsIn: bigint): BN {
-  const g = global as { initialVirtualTokenReserves?: BN; initialVirtualSolReserves?: BN };
-  const vT = BigInt((g.initialVirtualTokenReserves ?? new BN("1073000000000000")).toString());
-  const vS = BigInt((g.initialVirtualSolReserves ?? new BN("30000000000")).toString());
-  const solIn = (lamportsIn * 97n) / 100n;
-  return new BN(((vT * solIn) / (vS + solIn)).toString());
+/**
+ * Tokens a SOL dev buy gets on a brand-new curve, quoted the way Pump prices
+ * it (fees included), less a 2% cushion so the buy never asks for more than
+ * the SOL cap allows.
+ */
+function estimateTokensOut(global: Global, feeConfig: FeeConfig | null, lamportsIn: bigint): BN {
+  const out = getBuyTokenAmountFromSolAmount({
+    global, feeConfig, mintSupply: null, bondingCurve: null,
+    amount: new BN(lamportsIn.toString()), quoteMint: NATIVE_MINT,
+  });
+  return out.muln(98).divn(100);
 }
+
+/** Pays any creator fees left on the curve to `creator`'s vault. Pump refuses
+ * fee-sharing changes while that bucket is non-empty; harmless when empty. */
+const sweep = (payer: PublicKey, mint: PublicKey, creator: PublicKey) =>
+  PUMP_SDK.sweepCreatorFeeInstruction({ payer, mint, creator, quoteMint: NATIVE_MINT, quoteTokenProgram: TOKEN_PROGRAM_ID });
 
 async function setupTxs(creator: PublicKey, mint: PublicKey, p: { mode: Mode; prebuy: number }) {
   const treasury = new PublicKey(env.treasury);
+  // No compute-budget instruction in tx 2 or tx 3: both sit within ~30 bytes
+  // of the size limit, and the default (200k CU per instruction) is enough.
   const tx2 = txOf([
+    // A sniper's trade between tx 1 and tx 2 can leave fees on the curve.
+    await sweep(creator, mint, creator),
     ixCreateLaunch({
       creator, mint, treasury,
       venueAccount: pumpBondingCurvePda(mint),
@@ -61,6 +77,8 @@ async function setupTxs(creator: PublicKey, mint: PublicKey, p: { mode: Mode; pr
 
 async function sharesAndOpenTx(creator: PublicKey, mint: PublicKey, currentShareholders: PublicKey[]) {
   return txOf([
+    // From tx 2 on, the coin's creator is its sharing config.
+    await sweep(creator, mint, feeSharingConfigPda(mint)),
     ...toIxs(
       await PUMP_SDK.updateFeeSharesV2({
         authority: creator,
@@ -69,6 +87,7 @@ async function sharesAndOpenTx(creator: PublicKey, mint: PublicKey, currentShare
         newShareholders: vaultPdas(mint).map((address) => ({ address, shareBps: 1000 })),
         quoteMint: NATIVE_MINT,
         quoteTokenProgram: TOKEN_PROGRAM_ID,
+        bondingCurveComplete: false, // a fresh coin; saves 33 bytes
       }),
     ),
     ixOpenAuctionPump(mint),
@@ -83,36 +102,34 @@ export async function launchOnPump(
 ): Promise<{ mint: PublicKey; signatures: string[] }> {
   const mint = Keypair.generate();
   const online = new OnlinePumpSdk(conn);
-  const global = await online.fetchGlobal();
+  const [global, feeConfig] = await Promise.all([online.fetchGlobal(), online.fetchFeeConfig().catch(() => null)]);
 
-  const createIxs =
+  const meta = { mint: mint.publicKey, name: p.name, symbol: p.symbol, uri: p.uri, creator, user: creator, mayhemMode: false };
+  // [create_v2, user token account, buy]: the SOL-quoted legacy buy keeps
+  // create + buy inside one transaction, so nobody can buy before the dev.
+  const ixs =
     p.devBuyLamports > 0n
-      ? await PUMP_SDK.createV2AndBuyV2Instructions({
+      ? await PUMP_SDK.createV2AndBuyInstructions({
+          ...meta,
           global,
-          mint: mint.publicKey,
-          name: p.name,
-          symbol: p.symbol,
-          uri: p.uri,
-          creator,
-          user: creator,
-          quoteAmount: new BN(p.devBuyLamports.toString()), // max SOL spent
-          amount: estimateTokensOut(global, p.devBuyLamports),
-          mayhemMode: false,
+          solAmount: new BN(p.devBuyLamports.toString()), // max SOL spent
+          amount: estimateTokensOut(global, feeConfig, p.devBuyLamports),
         })
-      : toIxs(
-          await PUMP_SDK.createV2Instruction({
-            mint: mint.publicKey,
-            name: p.name,
-            symbol: p.symbol,
-            uri: p.uri,
-            creator,
-            user: creator,
-            mayhemMode: false,
-          }),
-        );
+      : [await PUMP_SDK.createV2Instruction(meta)];
+
+  // Two signers (wallet + mint). Prefer one transaction with a compute
+  // budget, then one without; a very long name/URI falls back to create,
+  // then buy, in back-to-back transactions.
+  let createTxs: Transaction[];
+  if (fitsLegacyTx([cu(350_000), ...ixs], creator, 2)) createTxs = [txOf([cu(350_000), ...ixs])];
+  else if (fitsLegacyTx(ixs, creator, 2)) createTxs = [txOf(ixs)];
+  else createTxs = [txOf(ixs.slice(0, 1)), txOf([cu(250_000), ...ixs.slice(1)])];
 
   const [tx2, tx3] = await setupTxs(creator, mint.publicKey, p);
-  const signatures = await signAndSendSequential(conn, [txOf(createIxs), tx2, tx3], [[mint]], onStep);
+  const extra = createTxs.length - 1; // report progress as the usual 3 steps
+  const signatures = await signAndSendSequential(conn, [...createTxs, tx2, tx3], [[mint]], (i) => {
+    if (i >= extra) onStep?.(i - extra);
+  });
   return { mint: mint.publicKey, signatures };
 }
 
@@ -152,30 +169,30 @@ export async function finishPumpSetup(conn: Connection, creator: PublicKey, mint
  * Permissionless: anyone can run it, typically the person about to claim.
  */
 export async function collectPumpFees(conn: Connection, payer: PublicKey, mint: PublicKey) {
-  const bc = await conn.getAccountInfo(pumpBondingCurvePda(mint));
-  const graduated = !!bc && bc.data[48] === 1; // BondingCurve.complete
-  const sharingConfigAddress = feeSharingConfigPda(mint);
-  const info = await conn.getAccountInfo(sharingConfigAddress);
+  const info = await conn.getAccountInfo(feeSharingConfigPda(mint));
   if (!info) throw new Error("Fee sharing is not set up for this coin.");
-  const sharingConfig = PUMP_SDK.decodeSharingConfig(info);
+  // Sweeps fees left on the curve / pool, consolidates AMM fees once the coin
+  // has graduated, then distributes to the ten vaults.
+  const { instructions, sweepCount } = await new OnlinePumpSdk(conn).buildDistributeCreatorFeesInstructions(mint, {
+    quoteMint: NATIVE_MINT, quoteTokenProgram: TOKEN_PROGRAM_ID, payer,
+  });
+  const all = [cu(400_000), ...instructions];
+  if (fitsLegacyTx(all, payer)) return signAndSendSequential(conn, [txOf(all)]);
+  // Too big for one legacy transaction: sweep first, then distribute.
+  return signAndSendSequential(conn, [
+    txOf([cu(200_000), ...instructions.slice(0, sweepCount)]),
+    txOf([cu(400_000), ...instructions.slice(sweepCount)]),
+  ].filter((t) => t.instructions.length > 1));
+}
 
-  const ixs: TransactionInstruction[] = [];
-  if (graduated) {
-    ixs.push(
-      ...toIxs(
-        await PUMP_SDK.transferCreatorFeesToPumpV2({
-          payer, mint, quoteMint: NATIVE_MINT, quoteTokenProgram: TOKEN_PROGRAM_ID,
-        }),
-      ),
-    );
+/** True when the instructions serialize into one legacy transaction (1232 bytes). */
+export function fitsLegacyTx(ixs: TransactionInstruction[], payer: PublicKey, signers = 1): boolean {
+  try {
+    const tx = txOf(ixs);
+    tx.feePayer = payer;
+    tx.recentBlockhash = PublicKey.default.toBase58();
+    return tx.serializeMessage().length + 1 + 64 * signers <= 1232;
+  } catch {
+    return false;
   }
-  ixs.push(
-    ...toIxs(
-      await PUMP_SDK.distributeCreatorFeesV2({
-        mint, sharingConfig, sharingConfigAddress, quoteMint: NATIVE_MINT, payer,
-        shouldInitializeAta: false, quoteTokenProgram: TOKEN_PROGRAM_ID,
-      }),
-    ),
-  );
-  return signAndSendSequential(conn, [txOf(ixs)]);
 }
