@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
+  base: "./",
   plugins: [nodePolyfills({ include: ["buffer", "crypto", "stream", "util"] })],
   build: {
     target: "es2020",

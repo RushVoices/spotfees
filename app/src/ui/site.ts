@@ -498,4 +498,4 @@ function onChainReady() {
 }
 window.addEventListener("stacks:ready", onChainReady, { once: true });
 // The Solana bundle is large: load it after the page is interactive.
-import("../main").catch((e) => console.warn("Chain module failed to load", e));
+if (!import.meta.env.VITE_NO_CHAIN) import("../main").catch((e) => console.warn("Chain module failed to load", e));
