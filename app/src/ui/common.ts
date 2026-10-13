@@ -126,6 +126,13 @@ function cleanAnchors() {
       e.preventDefault();
       if (location.hash) history.replaceState(null, "", location.pathname + location.search);
     }
+  }, true); // capture: runs before anything else can let the browser add the #
+  // Fallback: if a #section still lands in the URL, scroll there and remove it.
+  addEventListener("hashchange", () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    history.replaceState(null, "", location.pathname + location.search);
+    scrollToId(id, true);
   });
   // Arrived with a #section (e.g. from a docs link): jump there, then tidy the URL.
   if (location.hash) {
