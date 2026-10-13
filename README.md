@@ -40,6 +40,14 @@ Pump transaction notes (checked offline against `@pump-fun/pump-sdk` 4.0.0):
 
 **Auction rules.** Degen: 1.5 → 0.5 SOL, −0.125 SOL every 15 s. Builder: 4 → 1 SOL, −0.2 SOL every 15 s. The price restarts at the start after each take. The buyer signs a maximum price; if the price changed, the transaction fails and they pay nothing. Proceeds go to the creator, minus a 2% protocol fee to the treasury. Pre-bought Spots (up to 5) cost the creator only the 2% fee on the floor price.
 
+## Go live (switch on launching)
+
+```bash
+./scripts/go-live.sh --cluster devnet --treasury <YOUR_WALLET>
+```
+
+It makes your program id, builds and deploys the program, creates the protocol config, and prints the five Vercel environment variables to paste in (`VITE_CLUSTER`, `VITE_RPC_URL`, `VITE_STACKS_PROGRAM_ID`, `VITE_TREASURY`, `PINATA_JWT`). Redeploy on Vercel and the Launch button is live. Use `--cluster mainnet-beta --rpc <your RPC>` for mainnet once devnet works. The manual steps are below.
+
 ## Setup
 
 You need: Rust, the [Solana CLI 2.2](https://docs.anza.xyz/cli/install), [Anchor 0.31.1](https://www.anchor-lang.com/docs/installation) (`avm install 0.31.1`), Node 20+, a [Pinata](https://pinata.cloud) account (image uploads), and an RPC provider (Helius, Triton, QuickNode).
