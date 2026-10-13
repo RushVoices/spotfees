@@ -7,5 +7,5 @@
     <path d="M8 31c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 39.4 8 35z" opacity=".78"/>
     <path d="M8 18c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 26.4 8 22z"/>
   </g>
-  <ellipse cx="32" cy="18" rx="24" ry="8" fill="#b0eed0"/>
+  <ellipse cx="32" cy="18" rx="24" ry="8" fill="#b0eed0"/><ellipse cx="32" cy="18" rx="7" ry="2.6" fill="#06120d"/>
 </svg>

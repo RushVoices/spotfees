@@ -86,12 +86,12 @@ let hero: StackHandle | null = null;
 
 /* =============================== TICKER =============================== */
 const SAMPLE = [
-  { name: "Gigachad Cat", sym: "GIGA", mode: "degen" as ModeKey, sold: 7, hue: "#d9f7e8" },
-  { name: "Moon Committee", sym: "MOONC", mode: "builder" as ModeKey, sold: 3, hue: "#e8f6c9" },
-  { name: "Tiny Frog Club", sym: "TFC", mode: "degen" as ModeKey, sold: 9, hue: "#cdf3e2" },
-  { name: "Solar Punks", sym: "SOLP", mode: "builder" as ModeKey, sold: 1, hue: "#e2f3ea" },
-  { name: "Dog With Hat", sym: "HAT", mode: "degen" as ModeKey, sold: 10, hue: "#f0f7d8" },
-  { name: "Long Bread", sym: "LOAF", mode: "degen" as ModeKey, sold: 4, hue: "#d6f0ff" },
+  { name: "Gigachad Cat", sym: "GIGA", mode: "degen" as ModeKey, sold: 7, hue: "#d9f7e8", story: "The cat that never skips leg day. Ten Stacks for the ten loudest believers in the timeline." },
+  { name: "Moon Committee", sym: "MOONC", mode: "builder" as ModeKey, sold: 3, hue: "#e8f6c9", story: "A DAO that votes on one thing: when moon. Stack holders fund the memes and share the fees." },
+  { name: "Tiny Frog Club", sym: "TFC", mode: "degen" as ModeKey, sold: 9, hue: "#cdf3e2", story: "Small frog, big pond. A members-only club where the ten Stack holders run the vibes." },
+  { name: "Solar Punks", sym: "SOLP", mode: "builder" as ModeKey, sold: 1, hue: "#e2f3ea", story: "Building a sunlit future on Solana. Fees from every trade go to the ten people building it." },
+  { name: "Dog With Hat", sym: "HAT", mode: "degen" as ModeKey, sold: 10, hue: "#f0f7d8", story: "He kept the hat. All ten Stacks sold in four minutes." },
+  { name: "Long Bread", sym: "LOAF", mode: "degen" as ModeKey, sold: 4, hue: "#d6f0ff", story: "The longest loaf on-chain. Every trade adds a slice to the ten Stack vaults." },
 ];
 function renderTicker(items: { sym: string; sold: number; mode: ModeKey }[]) {
   const one = items.map((l, i) => {
@@ -181,6 +181,7 @@ renderTicker(SAMPLE);
 /* =============================== MARKET =============================== */
 interface Launch {
   id: number;
+  story?: string;
   live: boolean;
   mint?: string;
   name: string;
@@ -214,6 +215,7 @@ function cardHTML(l: Launch) {
       <div style="min-width:0"><h3>${esc(l.name)}</h3><span class="mono">$${esc(l.sym)}</span></div>
       <div class="chips"><span class="chip ${l.mode === "degen" ? "g" : ""}">${MODES[l.mode].label}</span></div>
     </div>
+    <p class="lc-story">${l.story ? esc(l.story) : "No narrative yet."}</p>
     <div class="lc-body">
       <div class="mini-stack" data-ms></div>
       <div class="lc-px">
@@ -349,6 +351,7 @@ $("#mineList").addEventListener("click", (e) => {
 /* =============================== LAUNCH FORM =============================== */
 (function launchForm() {
   const f = { mode: "degen" as ModeKey, pre: 2, img: null as File | null };
+  const descI = $<HTMLTextAreaElement>("#tDesc");
   const nameI = $<HTMLInputElement>("#tName"), symI = $<HTMLInputElement>("#tSym"), devI = $<HTMLInputElement>("#dev");
   const file = $<HTMLInputElement>("#tImg"), drop = $("#drop");
   const devVal = () => { const v = parseFloat(devI.value.replace(",", ".")); return isFinite(v) && v > 0 ? Math.min(v, 85) : 0; };
@@ -363,6 +366,10 @@ $("#mineList").addEventListener("click", (e) => {
     const dev = devVal();
     $("#pvName").textContent = nameI.value.trim() || "Your coin";
     $("#pvSym").textContent = "$" + (symI.value.trim() || "TICKER");
+    const story = descI.value.trim();
+    $("#descCt").textContent = `${descI.value.length}/500`;
+    $("#pvStory").textContent = story || "Your coin’s narrative shows up here.";
+    $("#pvStory").classList.toggle("empty-story", !story);
     $("#pvMode").textContent = m.label;
     if (!f.img) $("#pvAv").textContent = (symI.value.trim() || nameI.value.trim() || "?").slice(0, 1).toUpperCase();
     $("#sAuc").textContent = `${10 - f.pre} of 10`;
@@ -378,6 +385,7 @@ $("#mineList").addEventListener("click", (e) => {
     symI.value = symI.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     symI.classList.remove("bad"); render();
   });
+  descI.addEventListener("input", () => render());
   devI.addEventListener("input", () => { devI.value = devI.value.replace(/[^0-9.,]/g, ""); render(); });
   $("#devQuick").addEventListener("click", (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-v]");
@@ -447,7 +455,7 @@ $("#mineList").addEventListener("click", (e) => {
     try {
       const r = await window.StacksChain!.launch({
         venue: "pump", name: nameI.value.trim(), symbol: sym, image: f.img!,
-        description: $<HTMLTextAreaElement>("#tDesc").value.trim(),
+        description: descI.value.trim(),
         twitter: $<HTMLInputElement>("#sX").value.trim(), telegram: $<HTMLInputElement>("#sT").value.trim(), website: $<HTMLInputElement>("#sW").value.trim(),
         mode: f.mode, prebuy: f.pre, devBuySol: devVal(),
       }, step);
@@ -475,7 +483,7 @@ window.StacksUI = {
   toast,
   setLaunches(list: CardView[]) {
     launches = list.map((l, i) => ({
-      id: i, live: true, mint: l.mint, name: l.name, sym: l.sym, image: l.image, mode: l.mode,
+      id: i, live: true, mint: l.mint, name: l.name, sym: l.sym, image: l.image, story: l.story, mode: l.mode,
       sold: l.sold, status: l.status, nextIndex: l.nextIndex, hue: l.hue, t0: l.t0,
     }));
     $("#gridNote").textContent = "Live. Prices drop every 15 seconds and restart after each take. Taking a Stack is one transaction from your wallet.";

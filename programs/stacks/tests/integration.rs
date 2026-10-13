@@ -460,17 +460,10 @@ fn creator_cannot_be_redirected_and_auction_must_be_open() {
     let creator = user(&mut env.svm, 20);
     let mint = Pubkey::new_unique();
     let bc = put_pump_bonding_curve(&mut env.svm, &mint, &creator.pubkey());
+    let ix = ix_create_launch(&env, &creator.pubkey(), &mint, &bc, 0, 0, 0);
     send(
         &mut env.svm,
-        &[ix_create_launch(
-            &env,
-            &creator.pubkey(),
-            &mint,
-            &bc,
-            0,
-            0,
-            0,
-        )],
+        &[ix],
         &creator,
         &[],
     )
@@ -500,16 +493,10 @@ fn holders_claim_fees_paid_into_their_vault() {
     let mut env = setup();
     let (creator, mint) = open_pump_launch(&mut env);
     let buyer = user(&mut env.svm, 10);
+    let ix = ix_take(&env, &buyer.pubkey(), &creator.pubkey(), &mint, 7, 2 * SOL);
     send(
         &mut env.svm,
-        &[ix_take(
-            &env,
-            &buyer.pubkey(),
-            &creator.pubkey(),
-            &mint,
-            7,
-            2 * SOL,
-        )],
+        &[ix],
         &buyer,
         &[],
     )
@@ -577,16 +564,10 @@ fn stacks_can_be_transferred() {
     let mut env = setup();
     let (creator, mint) = open_pump_launch(&mut env);
     let buyer = user(&mut env.svm, 10);
+    let ix = ix_take(&env, &buyer.pubkey(), &creator.pubkey(), &mint, 9, 2 * SOL);
     send(
         &mut env.svm,
-        &[ix_take(
-            &env,
-            &buyer.pubkey(),
-            &creator.pubkey(),
-            &mint,
-            9,
-            2 * SOL,
-        )],
+        &[ix],
         &buyer,
         &[],
     )
@@ -636,16 +617,10 @@ fn launch_sells_out_after_ten_stacks() {
     let (creator, mint) = open_pump_launch(&mut env);
     let buyer = user(&mut env.svm, 20);
     for i in 3..10u8 {
+        let ix = ix_take(&env, &buyer.pubkey(), &creator.pubkey(), &mint, i, 2 * SOL);
         send(
             &mut env.svm,
-            &[ix_take(
-                &env,
-                &buyer.pubkey(),
-                &creator.pubkey(),
-                &mint,
-                i,
-                2 * SOL,
-            )],
+            &[ix],
             &buyer,
             &[],
         )

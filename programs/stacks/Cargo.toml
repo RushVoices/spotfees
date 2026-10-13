@@ -3,6 +3,8 @@ name = "stacks"
 version = "0.1.0"
 description = "Ten Stacks, one fee stream"
 edition = "2021"
+# Solana platform-tools (cargo-build-sbf, Solana 2.2) ship Rust 1.84.
+rust-version = "1.84"
 
 [lib]
 crate-type = ["cdylib", "lib"]

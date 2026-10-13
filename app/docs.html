@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Stacks Docs — how creator-fee Stacks work</title>
-<meta name="description" content="How Stacks splits a pump.fun token's creator fees into ten tradable shares: launching, the auction, earning, claiming, risks and the on-chain program.">
+<title>Spot Docs — how creator-fee Stacks work</title>
+<meta name="description" content="How Spot splits a pump.fun token's creator fees into ten tradable shares: launching, the auction, earning, claiming, risks and the on-chain program.">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,13 +22,13 @@
       <path d="M8 31c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 39.4 8 35z" opacity=".75"/>
       <path d="M8 18c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 26.4 8 22z"/>
     </g>
-    <ellipse cx="32" cy="18" rx="24" ry="8" fill="#b0eed0"/>
+    <ellipse cx="32" cy="18" rx="24" ry="8" fill="#b0eed0"/><ellipse cx="32" cy="18" rx="7" ry="2.6" fill="#06120d"/>
   </symbol>
 </svg>
 <div class="noise" aria-hidden="true"></div>
 
 <header class="nav" id="nav">
-  <a class="brand" href="./" aria-label="Stacks home"><svg class="brand-mark"><use href="#brandmark"/></svg><span class="brand-word">Stacks</span></a>
+  <a class="brand" href="./" aria-label="Spot home"><svg class="brand-mark"><use href="#brandmark"/></svg><span class="brand-word">Sp<i>o</i>t</span></a>
   <nav class="nav-links" id="navLinks" aria-label="Site">
     <a href="./#how">How it works</a>
     <a href="./#market">Market</a>
@@ -47,7 +47,7 @@
   <div class="wrap docs-hero-inner">
     <div>
       <p class="kicker rv">Documentation</p>
-      <h1 class="h-xl split" data-split>Everything about <span class="it green-text">Stacks.</span></h1>
+      <h1 class="h-xl split" data-split>Everything about <span class="it green-text">Spot.</span></h1>
       <p class="lede rv" style="--d:.3s">How a coin’s pump.fun creator fees become ten shares you can buy, hold, send and earn from. What is enforced on-chain, what isn’t, and how to check it yourself.</p>
       <div class="docs-meta rv" style="--d:.4s"><span class="chip g"><span class="dot"></span>pump.fun</span><span class="chip">Solana</span><span class="chip">~8 min read</span></div>
     </div>
@@ -82,7 +82,8 @@
     <section id="overview" data-ds>
       <p class="sec-n">01</p>
       <h2>Overview</h2>
-      <p class="big">Every pump.fun coin pays its creator a fee on every trade. <strong>Stacks splits that fee stream into ten equal shares</strong>, called Stacks, and sells them in an auction. Whoever holds a Stack receives 10% of the coin’s creator fees, in SOL, for as long as the coin trades.</p>
+      <p>On pump.fun, every trade pays the coin’s creator, and only the creator. That one seat collects fees for as long as the coin lives. Spot opens it up: creators sell a share of their future fees for SOL on day one, and the people who believe in a coin get a spot in what it earns.</p>
+      <p class="big">Every pump.fun coin pays its creator a fee on every trade. <strong>Spot splits that fee stream into ten equal shares</strong>, called Stacks, and sells them in an auction. Whoever holds a Stack receives 10% of the coin’s creator fees, in SOL, for as long as the coin trades.</p>
       <div class="flow-diagram card">
         <svg viewBox="0 0 760 250" role="img" aria-label="Trades on pump.fun pay creator fees into Pump's fee-sharing config, which pays ten Stack vaults 10% each; each Stack owner claims from their vault.">
           <defs>
@@ -121,13 +122,13 @@
           </g>
         </svg>
       </div>
-      <p>The split is set once, at launch, inside Pump’s own fee-sharing program, and then locked. Nothing about owning, buying or claiming a Stack touches Pump again. The Stacks program only keeps track of who owns each of the ten vaults and lets that owner withdraw.</p>
+      <p>The split is set once, at launch, inside Pump’s own fee-sharing program, and then locked. Nothing about owning, buying or claiming a Stack touches Pump again. The Spot program only keeps track of who owns each of the ten vaults and lets that owner withdraw.</p>
     </section>
 
     <section id="stacks" data-ds>
       <p class="sec-n">02</p>
       <h2>What a Stack is</h2>
-      <p>A Stack is a record in the Stacks program: <code>launch.owners[i]</code>, for <code>i</code> from 0 to 9. Each index has its own vault, an on-chain address that only the program can pay out of. Pump pays 10% of the coin’s creator fees into each vault.</p>
+      <p>A Stack is a record in the Spot program: <code>launch.owners[i]</code>, for <code>i</code> from 0 to 9. Each index has its own vault, an on-chain address that only the program can pay out of. Pump pays 10% of the coin’s creator fees into each vault.</p>
       <div class="kv">
         <div><span>Per coin</span><b>10 Stacks</b></div>
         <div><span>Share each</span><b>10% · 1,000 bps</b></div>
@@ -144,7 +145,7 @@
       <p>The launch form creates a normal pump.fun coin. It shows up on pump.fun and trades there like any other. The difference is where its creator fees go. Your wallet asks <strong>once</strong> and signs all three transactions together; the site then sends them in order.</p>
       <ol class="flow">
         <li><h3>Create the coin</h3><p>Pump’s <code>create_v2</code>, plus your optional dev buy in the <em>same</em> transaction, so nobody can buy before you. Your image and metadata are pinned to IPFS first.</p></li>
-        <li><h3>Register the Stacks and turn on fee sharing</h3><p>The Stacks program records the launch and checks on-chain that you are the coin’s creator, so nobody can register someone else’s coin. Then Pump’s <code>create_fee_sharing_config</code> moves the coin’s creator fees into a sharing config.</p></li>
+        <li><h3>Register the Stacks and turn on fee sharing</h3><p>The Spot program records the launch and checks on-chain that you are the coin’s creator, so nobody can register someone else’s coin. Then Pump’s <code>create_fee_sharing_config</code> moves the coin’s creator fees into a sharing config.</p></li>
         <li><h3>Point the fees at ten vaults, lock them, open the auction</h3><p>Pump’s <code>update_fee_shares</code> sets the shareholders to the ten Stack vaults at 1,000 bps each. Pump allows that list to be set once and then locks it. In the same transaction, <code>open_auction_pump</code> reads Pump’s config and refuses to open unless all ten vaults are there at exactly 10% and the config is locked.</p></li>
       </ol>
       <div class="callout ink"><b>Stopped halfway?</b> If you close your wallet after the coin is created but before step 3 lands, the coin exists but its Stacks aren’t on sale yet. Re-running setup from the same wallet picks up where it stopped (<code>finishPumpSetup</code> in <code>src/chain/pump.ts</code>).</div>
@@ -152,6 +153,7 @@
       <ul class="ticks">
         <li>A Solana wallet: Phantom, Solflare or Backpack.</li>
         <li>A name (32 characters max), a ticker (10 max) and a square image under 5 MB.</li>
+        <li>A narrative: the story of your coin, up to 500 characters. It’s saved in the coin’s metadata, so pump.fun, wallets and the Spot market all show it. It’s the first thing a Stack buyer reads.</li>
         <li>About 0.03 SOL for rent and network fees, plus the pre-buy fee and your dev buy.</li>
       </ul>
     </section>
@@ -213,7 +215,7 @@
             <tr><td>Pre-bought Stack</td><td>Creator</td><td>2% of the floor price, per Stack</td></tr>
             <tr><td>Launch fee</td><td>Creator</td><td>Set in the protocol config. 0 by default.</td></tr>
             <tr><td>Claims &amp; collects</td><td>Caller</td><td>Solana network fee only</td></tr>
-            <tr><td>Trading the coin</td><td>Traders</td><td>pump.fun’s own fees. Stacks takes nothing from trades.</td></tr>
+            <tr><td>Trading the coin</td><td>Traders</td><td>pump.fun’s own fees. Spot takes nothing from trades.</td></tr>
           </tbody>
         </table>
       </div>
@@ -222,7 +224,7 @@
     <section id="trust" data-ds>
       <p class="sec-n">08</p>
       <h2>What’s enforced on-chain</h2>
-      <p>Buyers shouldn’t have to trust the creator or this website. These checks run inside the Stacks program:</p>
+      <p>Buyers shouldn’t have to trust the creator or this website. These checks run inside the Spot program:</p>
       <ul class="ticks">
         <li><strong>Only the real creator can register a coin.</strong> <code>create_launch</code> reads Pump’s bonding curve and requires the signer to be its creator.</li>
         <li><strong>The auction can’t open until fees are locked to the vaults.</strong> <code>open_auction_pump</code> reads Pump’s sharing config and requires all ten vault addresses at 1,000 bps each, an active config, and a revoked admin.</li>
@@ -237,9 +239,9 @@
       <p class="sec-n">09</p>
       <h2>Risks</h2>
       <div class="risk-grid">
-        <div class="risk"><b>Unaudited code</b><p>The Stacks program has not been audited. Bugs could lose funds.</p></div>
+        <div class="risk"><b>Unaudited code</b><p>The Spot program has not been audited. Bugs could lose funds.</p></div>
         <div class="risk"><b>Volume can go to zero</b><p>A Stack only earns while the coin trades. Most coins stop trading.</p></div>
-        <div class="risk"><b>Pump can change</b><p>Pump runs its own programs and admin tools, including for community takeovers. Stacks can’t prevent changes Pump makes.</p></div>
+        <div class="risk"><b>Pump can change</b><p>Pump runs its own programs and admin tools, including for community takeovers. Spot can’t prevent changes Pump makes.</p></div>
         <div class="risk"><b>Fees aren’t automatic</b><p>Someone has to press Collect fees. Until then, fees wait at Pump.</p></div>
         <div class="risk"><b>No order book yet</b><p>Selling a Stack after the auction needs a buyer you trust.</p></div>
         <div class="risk"><b>Regulation</b><p>Selling shares of an income stream may be regulated where you live.</p></div>
@@ -293,6 +295,7 @@ npx vercel dev</code></pre>
         <details><summary>Does the coin trade differently from other pump.fun coins?</summary><p>No. It’s a standard pump.fun coin on the same bonding curve, and it graduates to PumpSwap the same way. Only the creator-fee recipient is different.</p></details>
         <details><summary>What happens when the coin graduates?</summary><p>Creator fees from PumpSwap trades still belong to the coin’s sharing config. <em>Collect fees</em> moves them back to Pump and distributes them to the vaults in one go.</p></details>
         <details><summary>What if nobody buys a Stack?</summary><p>It stays on sale at the floor price. Its vault keeps collecting fees, and the eventual buyer gets them.</p></details>
+        <details><summary>What makes a good narrative?</summary><p>Say why the coin exists and who it’s for, in a sentence or two. Stack buyers are paying for future trading volume, so tell them why people will keep trading it: a community, a running joke, a product, a cause.</p></details>
         <details><summary>Can I hold more than one Stack?</summary><p>Yes. Take as many as you like, up to all ten.</p></details>
         <details><summary>Why one wallet prompt for three transactions?</summary><p>The site asks your wallet to sign all three together, then sends them in order and waits for each to land. They are separate only because together they don’t fit Solana’s size limit for one transaction.</p></details>
       </div>
@@ -307,7 +310,7 @@ npx vercel dev</code></pre>
 
 <footer class="foot">
   <div class="wrap">
-    <div class="foot-bot" style="margin-top:0;border-top:0;padding-top:0"><span>Unaudited software. Nothing here is financial advice.</span><span><a href="./">Stacks</a> · Built on Solana · pump.fun</span></div>
+    <div class="foot-bot" style="margin-top:0;border-top:0;padding-top:0"><span>Unaudited software. Nothing here is financial advice.</span><span><a href="./">Spot</a> · Built on Solana · pump.fun</span></div>
   </div>
 </footer>
 <div id="toast" role="status" aria-live="polite"></div>

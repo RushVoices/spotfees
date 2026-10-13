@@ -51,7 +51,7 @@ export default async function handler(req: Request): Promise<Response> {
     description: text("description", 500),
     image: `${gateway}${imageCid}`,
     showName: true,
-    createdOn: "stacks",
+    createdOn: "spot",
     twitter: text("twitter", 200) || undefined,
     telegram: text("telegram", 200) || undefined,
     website: text("website", 200) || undefined,

@@ -25,7 +25,7 @@ const sol = (l: bigint) => Number(l) / LAMPORTS_PER_SOL;
 // ---- token names/images ------------------------------------------------------
 
 const METAPLEX = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
-interface TokenInfo { name: string; symbol: string; image?: string }
+interface TokenInfo { name: string; symbol: string; image?: string; description?: string }
 const metaCache = new Map<string, TokenInfo>();
 
 function readBorshString(d: Buffer, o: number): [string, number] {
@@ -58,6 +58,7 @@ async function tokenInfo(mint: PublicKey, venue: Venue): Promise<TokenInfo> {
     if (uri) {
       const json = await fetch(uri).then((r) => r.json()).catch(() => null);
       if (json?.image) info.image = String(json.image);
+      if (json?.description) info.description = String(json.description).slice(0, 500);
     }
   } catch { /* show the fallback */ }
   metaCache.set(key, info);
@@ -72,6 +73,8 @@ export interface CardView {
   name: string;
   sym: string;
   image?: string;
+  /** The coin's narrative (metadata description). */
+  story?: string;
   venue: "Pump" | "Meteora";
   mode: "degen" | "builder";
   sold: number;
@@ -106,6 +109,7 @@ async function toView(l: LaunchState, i: number): Promise<CardView> {
     name: meta.name,
     sym: meta.symbol,
     image: meta.image,
+    story: meta.description,
     venue: l.venue === Venue.Pump ? "Pump" : "Meteora",
     mode: l.mode === Mode.Builder ? "builder" : "degen",
     sold: l.sold,

@@ -1,10 +1,10 @@
-# Stacks
+# Spot
 
-Turn a token's creator fees into ten Stacks. Buy a share. Earn as it trades.
+**Spot**: turn a token’s creator fees into ten Stacks. Buy a share. Earn as it trades.
 
 Creators launch a coin on **pump.fun** (Meteora is supported by the program and SDK code, but not shown on the site). The coin's creator fees are split into ten equal Stacks, which are sold by a descending-price auction. Holders earn 10% of the creator fees each, for as long as the coin trades.
 
-> **Status: unaudited, not yet run end to end.** Everything here was written against Pump's and Meteora's published program source and IDLs. The machine it was written on could not download packages or reach Solana, so nothing has been compiled or run yet. Follow the checklist below on **devnet** before any real SOL is involved, and get the program audited before mainnet.
+> **Status: unaudited, not yet run on a live network.** The program builds with `cargo-build-sbf` (Solana 2.2) and passes its 6 unit tests and 10 integration tests, which run the compiled program against byte-for-byte copies of Pump's and Meteora's accounts. The site's pump.fun launch passes an offline simulation (`npm run test:launch` in `app/`): transaction count, signers, instruction order, and Solana's 1232-byte size limit. Nothing has touched devnet or mainnet yet. Follow the checklist below on **devnet** before any real SOL is involved, and get the program audited before mainnet.
 
 ## What's in here
 
@@ -56,7 +56,7 @@ This creates `keys/stacks-program-keypair.json` and writes its address into the 
 
 ```bash
 cargo build-sbf --manifest-path programs/stacks/Cargo.toml
-cargo test -p stacks            # unit tests + 10 integration tests
+cargo test -p stacks            # unit tests + 10 integration tests (needs the .so from the line above)
 ```
 
 All tests should pass. If a dependency version clashes (`litesvm` vs `solana-sdk`), align `solana-sdk` in `programs/stacks/Cargo.toml` with the version `litesvm` pulls in.
@@ -83,6 +83,7 @@ RPC_URL=https://api.devnet.solana.com npx tsx init-config.ts --treasury <YOUR_TR
 ```bash
 cd app && npm install
 npm run typecheck       # do this first: it checks every Pump/Meteora SDK call
+npm run test:launch     # offline run of the whole pump.fun launch (sizes, signers, order)
 cp .env.example .env    # fill in RPC, treasury, Meteora config
 npx vercel dev          # runs the site and the /api/upload route together
 # or, without uploads: npm run dev   (http://localhost:5173, docs at /docs.html)
