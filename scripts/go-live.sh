@@ -63,14 +63,13 @@ cat <<OUT
 
 Spot is on $CLUSTER. Program: $PROGRAM_ID
 
-Now in Vercel -> spotfees -> Settings -> Environment Variables, add:
+Now in Vercel -> spotfees -> Environments -> Production -> Environment Variables, add:
 
   VITE_CLUSTER            $CLUSTER
-  VITE_RPC_URL            <your Helius/Triton/QuickNode $CLUSTER URL>
   VITE_STACKS_PROGRAM_ID  $PROGRAM_ID
   VITE_TREASURY           $TREASURY
-  PINATA_JWT              <from pinata.cloud -> API Keys>
+  RPC_URL                 <your Helius $CLUSTER URL>   (server-side; leave VITE_RPC_URL unset)
 
-Then redeploy. The Launch button goes live.
-Commit the changed program id (git add -A; never commit keys/, it's gitignored).
+Then redeploy. Launches now create ten Spots and show up in the market.
+Back up keys/stacks-program-keypair.json and your wallet file somewhere safe.
 OUT
