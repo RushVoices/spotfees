@@ -59,8 +59,9 @@ const coder = new BorshAccountsCoder(pumpIdl as never);
     },
     async getMultipleAccountsInfo(ks: PublicKey[]) { return Promise.all(ks.map((k) => this.getAccountInfo(k))); },
     async getLatestBlockhash() { return { blockhash: Keypair.generate().publicKey.toBase58(), lastValidBlockHeight: 1000 }; },
-    async sendRawTransaction(raw: Buffer) { sent.push(Transaction.from(raw)); return `sig${sent.length}`; },
-    async confirmTransaction() { return { value: { err: null } }; },
+    async sendRawTransaction(raw: Buffer, o?: { skipPreflight?: boolean }) { if (!o?.skipPreflight) sent.push(Transaction.from(raw)); return `sig${sent.length}`; },
+    async getSignatureStatuses() { return { value: [{ err: null, confirmationStatus: "confirmed" }] }; },
+    async getBlockHeight() { return 1; },
   };
 
   // ---- fake wallet (Phantom shape) ----

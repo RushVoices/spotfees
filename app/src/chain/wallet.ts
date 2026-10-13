@@ -59,11 +59,30 @@ export async function signAndSendSequential(
   const signed = await wallet.signAllTransactions(txs);
   const sigs: string[] = [];
   for (let i = 0; i < signed.length; i++) {
-    const sig = await conn.sendRawTransaction(signed[i].serialize(), { skipPreflight: false });
-    const res = await conn.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
-    if (res.value.err) throw new Error(`Transaction ${i + 1} failed: ${JSON.stringify(res.value.err)}`);
+    const raw = signed[i].serialize();
+    const sig = await conn.sendRawTransaction(raw, { skipPreflight: false, maxRetries: 0 });
+    await confirmByPolling(conn, sig, raw, lastValidBlockHeight, i);
     sigs.push(sig);
     onStep?.(i, sig);
   }
   return sigs;
+}
+
+/**
+ * Waits for a transaction by polling its status (no websocket, so it works
+ * through the site's /api/rpc route), re-sending it every few seconds until
+ * it lands or its blockhash expires.
+ */
+async function confirmByPolling(conn: Connection, sig: string, raw: Buffer | Uint8Array, lastValidBlockHeight: number, i: number) {
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  for (let n = 0; ; n++) {
+    await sleep(1000);
+    const { value: [st] } = await conn.getSignatureStatuses([sig]);
+    if (st?.err) throw new Error(`Transaction ${i + 1} failed: ${JSON.stringify(st.err)}`);
+    if (st && (st.confirmationStatus === "confirmed" || st.confirmationStatus === "finalized")) return;
+    if (n % 3 === 2) {
+      if ((await conn.getBlockHeight("confirmed")) > lastValidBlockHeight) throw new Error("Transaction expired: block height exceeded. Try again.");
+      conn.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 }).catch(() => {});
+    }
+  }
 }

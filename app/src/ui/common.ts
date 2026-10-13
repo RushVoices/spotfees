@@ -22,6 +22,7 @@ export function friendly(err: unknown): string {
   if (/NotStackOwner|6017|0x1781/i.test(m)) return "That Spot isn’t in this wallet.";
   if (/Invalid public key|Non-base58/i.test(m)) return "That doesn’t look like a Solana address.";
   if (/insufficient lamports|insufficient funds|0x1\b/i.test(m)) return "Not enough SOL in your wallet for this.";
+  if (/\b403\b|Access forbidden|Solana network is busy|\b429\b/i.test(m)) return "The Solana network didn’t answer. Try again in a moment.";
   if (/blockhash not found|block height exceeded|expired/i.test(m)) return "The network was slow and the transaction expired. Try again.";
   return m.length > 160 ? m.slice(0, 160) + "…" : m;
 }
