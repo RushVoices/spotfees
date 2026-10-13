@@ -104,7 +104,44 @@ export function countUp() {
   $$("[data-count]").forEach((el) => io.observe(el));
 }
 
+/**
+ * In-page links (#how, ./#launch, /#market) scroll smoothly without putting
+ * the #section in the address bar, so the URL stays clean (spotfees.trade/).
+ */
+function cleanAnchors() {
+  const scrollToId = (id: string, smooth: boolean) => {
+    const el = id ? document.getElementById(id) : null;
+    if (el) el.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+    else if (id === "top" || !id) scrollTo({ top: 0, behavior: smooth ? "smooth" : "auto" });
+    return !!el || id === "top" || !id;
+  };
+  document.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = (e.target as HTMLElement).closest?.<HTMLAnchorElement>("a[href]");
+    if (!a || a.target === "_blank") return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || url.pathname !== location.pathname || !url.hash) return;
+    const id = decodeURIComponent(url.hash.slice(1));
+    if (scrollToId(id, true)) {
+      e.preventDefault();
+      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    }
+  });
+  // Arrived with a #section (e.g. from a docs link): jump there, then tidy the URL.
+  if (location.hash) {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const go = () => {
+      scrollToId(id, false);
+      history.replaceState(null, "", location.pathname + location.search);
+      setTimeout(() => scrollToId(id, false), 350); // again, after late layout shifts
+    };
+    if (document.readyState === "complete") go();
+    else addEventListener("load", go, { once: true });
+  }
+}
+
 export function initChrome() {
+  cleanAnchors();
   // nav
   const nav = $("#nav");
   const menu = $("#menuBtn");
