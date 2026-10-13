@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Spot banner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="./brand.css">
+<style>
+  .art { width: 1500px; height: 500px; background: linear-gradient(100deg, #ffffff 0%, #ffffff 40%, var(--g-50) 70%, #d2f4e2 100%); }
+  .grid { -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 45%, #000 100%); mask-image: linear-gradient(90deg, transparent 0%, #000 45%, #000 100%); }
+  canvas { right: 40px; top: -40px; width: 680px; height: 580px; }
+  .copy { position: absolute; left: 330px; top: 70px; z-index: 4; width: 640px; }
+  .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+  .brand svg { width: 46px; height: 46px; }
+  .brand span { font-family: var(--serif); font-size: 46px; line-height: 1; letter-spacing: -.02em; }
+  .brand span i { color: var(--g-600); }
+  h1 { margin: 0; font-weight: 600; font-size: 66px; line-height: .98; letter-spacing: -.045em; }
+  h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.015em; font-size: 1.1em;
+    background: linear-gradient(100deg, var(--g-700), var(--g-500) 50%, var(--g-400)); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .06em; }
+  p { margin: 22px 0 0; font-size: 24px; color: var(--ink-2); letter-spacing: -.01em; }
+  p b { color: var(--ink); font-weight: 600; }
+  .chips { display: flex; gap: 10px; margin-top: 26px; }
+  .g1 { right: 40px; top: 40px; }
+  .g2 { right: 40px; bottom: 40px; }
+</style></head>
+<body>
+<div class="art">
+  <div class="grid"></div>
+  <div class="blob" style="width:620px;height:620px;right:60px;top:-60px;background:radial-gradient(circle,rgba(47,209,138,.5),transparent 65%)"></div>
+  <div class="blob" style="width:360px;height:360px;right:520px;top:180px;background:radial-gradient(circle,rgba(198,245,108,.45),transparent 65%)"></div>
+  <div class="copy">
+    <div class="brand">
+      <svg viewBox="0 0 64 64"><defs><linearGradient id="bm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fd18a"/><stop offset="1" stop-color="#087f50"/></linearGradient></defs>
+        <g fill="url(#bm)"><path d="M8 44c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 52.4 8 48z" opacity=".5"/><path d="M8 31c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 39.4 8 35z" opacity=".75"/><path d="M8 18c0-4.4 10.7-8 24-8s24 3.6 24 8v4c0 4.4-10.7 8-24 8S8 26.4 8 22z"/></g>
+        <ellipse cx="32" cy="18" rx="24" ry="8" fill="#b0eed0"/><ellipse cx="32" cy="18" rx="7" ry="2.6" fill="#06120d"/></svg>
+      <span>Sp<i>o</i>t</span>
+    </div>
+    <h1>Turn creator fees into <em>ten Spots.</em></h1>
+    <p>Buy a share. <b>Earn as it trades.</b></p>
+    <div class="chips"><span class="chip"><span class="dot"></span>pump.fun</span><span class="chip">10 × 10% of fees</span><span class="chip">Paid in SOL</span></div>
+  </div>
+  <canvas id="c"></canvas>
+  <div class="glass g1"><span class="k">Just taken</span><b>Spot <i>04</i> · 0.875 <small>SOL</small></b></div>
+  <div class="glass g2"><span class="k">Fees streamed</span><b>12.4821 <small>SOL</small></b></div>
+  <div class="noise"></div>
+</div>
+<script type="module">
+  import { createStack } from "../src/ui/stack3d.ts";
+  const s = createStack(document.getElementById("c"), { sold: 4, still: true, zoom: 1.0, exposure: 0.8 });
+  s.setExplode(0.55);
+  document.fonts.ready.then(() => setTimeout(() => (window.__ready = true), 2500));
+</script>
+</body></html>

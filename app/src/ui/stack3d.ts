@@ -17,6 +17,12 @@ export interface StackOptions {
   compact?: boolean;
   onHover?: (index: number | null, x: number, y: number) => void;
   onTake?: (sold: number) => void;
+  /** Camera distance multiplier (1 = default framing). */
+  zoom?: number;
+  /** Freeze motion, for still renders (brand images). */
+  still?: boolean;
+  /** Tone-mapping exposure; lower gives deeper, more saturated jade. */
+  exposure?: number;
 }
 
 export interface StackHandle {
@@ -110,7 +116,7 @@ export function createStack(canvas: HTMLCanvasElement, opts: StackOptions = {}):
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = opts.exposure ?? 1.05;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
@@ -119,7 +125,7 @@ export function createStack(canvas: HTMLCanvasElement, opts: StackOptions = {}):
   scene.environment = envTex;
 
   const camera = new THREE.PerspectiveCamera(opts.compact ? 30 : 32, 1, 0.1, 100);
-  const camDist = opts.compact ? 11.5 : 10.5;
+  const camDist = (opts.compact ? 11.5 : 10.5) * (opts.zoom ?? 1);
 
   // lights: soft key, cool fill, green rim
   const key = new THREE.DirectionalLight(0xffffff, 1.6);
@@ -251,7 +257,7 @@ export function createStack(canvas: HTMLCanvasElement, opts: StackOptions = {}):
   let lastTake = performance.now();
   let resetAt = 0;
   const clock = new THREE.Clock();
-  const motion = !reduceMotion();
+  const motion = !reduceMotion() && !opts.still;
 
   const stackHeight = () => N * H + (N - 1) * GAP;
 
@@ -433,7 +439,7 @@ export function createStack(canvas: HTMLCanvasElement, opts: StackOptions = {}):
       sold = n;
       coins.forEach((c, i) => { c.taken = i < sold; c.take = -1; paint(c); });
     },
-    setExplode(e: number) { explodeTarget = Math.max(0, Math.min(1, e)); },
+    setExplode(e: number) { explodeTarget = Math.max(0, Math.min(1, e)); if (opts.still) explode = explodeTarget; },
     dispose() {
       cancelAnimationFrame(raf);
       ro.disconnect();

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Spot PFP</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="./brand.css">
+<style>
+  .art { width: 1000px; height: 1000px; }
+  .light { background: radial-gradient(62% 62% at 50% 48%, #ffffff 0%, #ffffff 45%, var(--g-50) 75%, var(--g-100) 100%); }
+  .light .grid { -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 62%); mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 62%); }
+  .dark { background: radial-gradient(70% 70% at 50% 40%, #0d7a4f 0%, #075a3a 45%, #042a1c 100%); }
+  .dark .grid { background-image: linear-gradient(rgba(176,238,208,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(176,238,208,.08) 1px, transparent 1px); -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 65%); mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 65%); }
+  .ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); z-index: -1; }
+  canvas { inset: 0; width: 1000px; height: 1000px; }
+</style></head>
+<body>
+<div class="art light" id="light">
+  <div class="grid"></div>
+  <div class="blob" style="width:620px;height:620px;left:190px;top:230px;background:radial-gradient(circle,rgba(47,209,138,.55),transparent 65%)"></div>
+  <div class="blob" style="width:380px;height:380px;left:520px;top:120px;background:radial-gradient(circle,rgba(198,245,108,.55),transparent 65%)"></div>
+  <div class="ring" style="width:860px;height:860px;border:1.5px solid rgba(9,164,101,.18)"></div>
+  <div class="ring" style="width:760px;height:760px;border:1px dashed rgba(9,164,101,.22)"></div>
+  <canvas id="c1"></canvas>
+  <div class="noise"></div>
+</div>
+<div class="art dark" id="dark">
+  <div class="grid"></div>
+  <div class="blob" style="width:640px;height:640px;left:180px;top:220px;background:radial-gradient(circle,rgba(61,255,168,.45),transparent 65%)"></div>
+  <div class="ring" style="width:860px;height:860px;border:1.5px solid rgba(176,238,208,.22)"></div>
+  <div class="ring" style="width:760px;height:760px;border:1px dashed rgba(176,238,208,.2)"></div>
+  <canvas id="c2"></canvas>
+  <div class="noise" style="mix-blend-mode:overlay;opacity:.08"></div>
+</div>
+<script type="module">
+  import { createStack } from "../src/ui/stack3d.ts";
+  const a = createStack(document.getElementById("c1"), { sold: 4, still: true, zoom: 1.0, exposure: 0.78 });
+  a.setExplode(0.62);
+  const b = createStack(document.getElementById("c2"), { sold: 4, still: true, zoom: 1.0, exposure: 0.85 });
+  b.setExplode(0.62);
+  document.fonts.ready.then(() => setTimeout(() => (window.__ready = true), 2500));
+</script>
+</body></html>
