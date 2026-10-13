@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Spot Docs — how creator-fee Stacks work</title>
+<title>Spot Docs — how creator-fee Spots work</title>
 <meta name="description" content="How Spot splits a pump.fun token's creator fees into ten tradable shares: launching, the auction, earning, claiming, risks and the on-chain program.">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -60,7 +60,7 @@
     <p class="mono">On this page</p>
     <nav id="toc">
       <a href="#overview">Overview</a>
-      <a href="#stacks">What a Stack is</a>
+      <a href="#spots">What a Spot is</a>
       <a href="#pump">Launching on pump.fun</a>
       <a href="#auction">The auction</a>
       <a href="#earning">Earning &amp; claiming</a>
@@ -83,9 +83,9 @@
       <p class="sec-n">01</p>
       <h2>Overview</h2>
       <p>On pump.fun, every trade pays the coin’s creator, and only the creator. That one seat collects fees for as long as the coin lives. Spot opens it up: creators sell a share of their future fees for SOL on day one, and the people who believe in a coin get a spot in what it earns.</p>
-      <p class="big">Every pump.fun coin pays its creator a fee on every trade. <strong>Spot splits that fee stream into ten equal shares</strong>, called Stacks, and sells them in an auction. Whoever holds a Stack receives 10% of the coin’s creator fees, in SOL, for as long as the coin trades.</p>
+      <p class="big">Every pump.fun coin pays its creator a fee on every trade. <strong>Spot splits that fee stream into ten equal shares</strong>, called Spots, and sells them in an auction. Whoever holds a Spot receives 10% of the coin’s creator fees, in SOL, for as long as the coin trades.</p>
       <div class="flow-diagram card">
-        <svg viewBox="0 0 760 250" role="img" aria-label="Trades on pump.fun pay creator fees into Pump's fee-sharing config, which pays ten Stack vaults 10% each; each Stack owner claims from their vault.">
+        <svg viewBox="0 0 760 250" role="img" aria-label="Trades on pump.fun pay creator fees into Pump's fee-sharing config, which pays ten Spot vaults 10% each; each Spot owner claims from their vault.">
           <defs>
             <linearGradient id="fd-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2fd18a"/><stop offset="1" stop-color="#09a465"/></linearGradient>
             <marker id="fd-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#09a465"/></marker>
@@ -122,21 +122,21 @@
           </g>
         </svg>
       </div>
-      <p>The split is set once, at launch, inside Pump’s own fee-sharing program, and then locked. Nothing about owning, buying or claiming a Stack touches Pump again. The Spot program only keeps track of who owns each of the ten vaults and lets that owner withdraw.</p>
+      <p>The split is set once, at launch, inside Pump’s own fee-sharing program, and then locked. Nothing about owning, buying or claiming a Spot touches Pump again. The Spot program only keeps track of who owns each of the ten vaults and lets that owner withdraw.</p>
     </section>
 
-    <section id="stacks" data-ds>
+    <section id="spots" data-ds>
       <p class="sec-n">02</p>
-      <h2>What a Stack is</h2>
-      <p>A Stack is a record in the Spot program: <code>launch.owners[i]</code>, for <code>i</code> from 0 to 9. Each index has its own vault, an on-chain address that only the program can pay out of. Pump pays 10% of the coin’s creator fees into each vault.</p>
+      <h2>What a Spot is</h2>
+      <p>A Spot is a record in the Spot program: <code>launch.owners[i]</code>, for <code>i</code> from 0 to 9. Each index has its own vault, an on-chain address that only the program can pay out of. Pump pays 10% of the coin’s creator fees into each vault.</p>
       <div class="kv">
-        <div><span>Per coin</span><b>10 Stacks</b></div>
+        <div><span>Per coin</span><b>10 Spots</b></div>
         <div><span>Share each</span><b>10% · 1,000 bps</b></div>
         <div><span>Paid in</span><b>SOL</b></div>
         <div><span>Lasts</span><b>As long as the coin trades</b></div>
       </div>
-      <p>A Stack is not a token. It doesn’t sit in your wallet’s token list; it lives in the coin’s launch account, and this site reads it from there. That keeps it cheap and makes the ownership rules simple: one owner per Stack, changed only by buying it at auction or by its owner sending it.</p>
-      <div class="callout"><b>Unsold Stacks still earn.</b> Fees paid into a Stack’s vault before anyone buys it stay in the vault and go to whoever takes it.</div>
+      <p>A Spot is not a token. It doesn’t sit in your wallet’s token list; it lives in the coin’s launch account, and this site reads it from there. That keeps it cheap and makes the ownership rules simple: one owner per Spot, changed only by buying it at auction or by its owner sending it.</p>
+      <div class="callout"><b>Unsold Spots still earn.</b> Fees paid into a Spot’s vault before anyone buys it stay in the vault and go to whoever takes it.</div>
     </section>
 
     <section id="pump" data-ds>
@@ -145,15 +145,15 @@
       <p>The launch form creates a normal pump.fun coin. It shows up on pump.fun and trades there like any other. The difference is where its creator fees go. Your wallet asks <strong>once</strong> and signs all three transactions together; the site then sends them in order.</p>
       <ol class="flow">
         <li><h3>Create the coin</h3><p>Pump’s <code>create_v2</code>, plus your optional dev buy in the <em>same</em> transaction, so nobody can buy before you. Your image and metadata are pinned to IPFS first.</p></li>
-        <li><h3>Register the Stacks and turn on fee sharing</h3><p>The Spot program records the launch and checks on-chain that you are the coin’s creator, so nobody can register someone else’s coin. Then Pump’s <code>create_fee_sharing_config</code> moves the coin’s creator fees into a sharing config.</p></li>
-        <li><h3>Point the fees at ten vaults, lock them, open the auction</h3><p>Pump’s <code>update_fee_shares</code> sets the shareholders to the ten Stack vaults at 1,000 bps each. Pump allows that list to be set once and then locks it. In the same transaction, <code>open_auction_pump</code> reads Pump’s config and refuses to open unless all ten vaults are there at exactly 10% and the config is locked.</p></li>
+        <li><h3>Register the Spots and turn on fee sharing</h3><p>The Spot program records the launch and checks on-chain that you are the coin’s creator, so nobody can register someone else’s coin. Then Pump’s <code>create_fee_sharing_config</code> moves the coin’s creator fees into a sharing config.</p></li>
+        <li><h3>Point the fees at ten vaults, lock them, open the auction</h3><p>Pump’s <code>update_fee_shares</code> sets the shareholders to the ten Spot vaults at 1,000 bps each. Pump allows that list to be set once and then locks it. In the same transaction, <code>open_auction_pump</code> reads Pump’s config and refuses to open unless all ten vaults are there at exactly 10% and the config is locked.</p></li>
       </ol>
-      <div class="callout ink"><b>Stopped halfway?</b> If you close your wallet after the coin is created but before step 3 lands, the coin exists but its Stacks aren’t on sale yet. Re-running setup from the same wallet picks up where it stopped (<code>finishPumpSetup</code> in <code>src/chain/pump.ts</code>).</div>
+      <div class="callout ink"><b>Stopped halfway?</b> If you close your wallet after the coin is created but before step 3 lands, the coin exists but its Spots aren’t on sale yet. Re-running setup from the same wallet picks up where it stopped (<code>finishPumpSetup</code> in <code>src/chain/pump.ts</code>).</div>
       <h3>What you need</h3>
       <ul class="ticks">
         <li>A Solana wallet: Phantom, Solflare or Backpack.</li>
         <li>A name (32 characters max), a ticker (10 max) and a square image under 5 MB.</li>
-        <li>A narrative: the story of your coin, up to 500 characters. It’s saved in the coin’s metadata, so pump.fun, wallets and the Spot market all show it. It’s the first thing a Stack buyer reads.</li>
+        <li>A narrative: the story of your coin, up to 500 characters. It’s saved in the coin’s metadata, so pump.fun, wallets and the Spot market all show it. It’s the first thing a Spot buyer reads.</li>
         <li>About 0.03 SOL for rent and network fees, plus the pre-buy fee and your dev buy.</li>
       </ul>
     </section>
@@ -161,7 +161,7 @@
     <section id="auction" data-ds>
       <p class="sec-n">04</p>
       <h2>The auction</h2>
-      <p>Stacks are sold one at a time in a descending-price (Dutch) auction. The price starts high and drops a fixed amount every 15 seconds until it reaches a floor. The first person to take it pays the current price. Then the clock restarts at the top for the next Stack.</p>
+      <p>Spots are sold one at a time in a descending-price (Dutch) auction. The price starts high and drops a fixed amount every 15 seconds until it reaches a floor. The first person to take it pays the current price. Then the clock restarts at the top for the next Spot.</p>
       <div class="formula">price = max( <b>floor</b>, <b>start</b> − <b>drop</b> × ⌊ seconds since last take ÷ 15 ⌋ )</div>
       <div class="tbl-wrap">
         <table class="tbl">
@@ -172,15 +172,15 @@
           </tbody>
         </table>
       </div>
-      <p><strong>You can’t overpay.</strong> When you take a Stack you sign a maximum price: the price you saw. If someone takes it first, the price restarts higher, your maximum is too low, and the transaction fails. You pay nothing but the network fee.</p>
+      <p><strong>You can’t overpay.</strong> When you take a Spot you sign a maximum price: the price you saw. If someone takes it first, the price restarts higher, your maximum is too low, and the transaction fails. You pay nothing but the network fee.</p>
       <p><strong>Where the money goes.</strong> The sale price goes to the coin’s creator, minus a 2% protocol fee to the treasury. The program pays both directly in the same transaction.</p>
-      <p><strong>Pre-buys.</strong> A creator can keep up to five Stacks at launch. They pay only the 2% fee on the floor price for each, because the rest of the price would be paid to themselves.</p>
+      <p><strong>Pre-buys.</strong> A creator can keep up to five Spots at launch. They pay only the 2% fee on the floor price for each, because the rest of the price would be paid to themselves.</p>
     </section>
 
     <section id="earning" data-ds>
       <p class="sec-n">05</p>
       <h2>Earning &amp; claiming</h2>
-      <p>Fees reach your Stack in two steps, and anyone can run either one.</p>
+      <p>Fees reach your Spot in two steps, and anyone can run either one.</p>
       <div class="two">
         <div class="card mini">
           <span class="step-n">Collect</span>
@@ -190,18 +190,18 @@
         <div class="card mini">
           <span class="step-n">Claim</span>
           <h3>Your vault → you</h3>
-          <p><em>Claim</em> sends everything in your Stack’s vault above its rent reserve to your wallet. Only the Stack’s current owner can claim it. There’s no deadline: unclaimed SOL waits in the vault.</p>
+          <p><em>Claim</em> sends everything in your Spot’s vault above its rent reserve to your wallet. Only the Spot’s current owner can claim it. There’s no deadline: unclaimed SOL waits in the vault.</p>
         </div>
       </div>
-      <p>Because collecting pays every vault, one holder pressing <em>Collect fees</em> helps all ten. If you hold several Stacks of the same coin, collect once, then claim each.</p>
+      <p>Because collecting pays every vault, one holder pressing <em>Collect fees</em> helps all ten. If you hold several Spots of the same coin, collect once, then claim each.</p>
     </section>
 
     <section id="trading" data-ds>
       <p class="sec-n">06</p>
       <h2>Sending &amp; trading</h2>
-      <p>Today a Stack changes hands in two ways: buying it in the auction, or its owner sending it with <code>transfer_stack</code>. Use <em>Send</em> in My Stacks. The Stack moves together with any SOL still unclaimed in its vault, so claim first if you want to keep that.</p>
-      <p>Because a send is one signed transaction, two people can trade a Stack over the counter: the buyer pays, the seller sends. That needs trust between them. An on-chain order book, where a sale and the payment settle in one transaction, is the next thing on the roadmap.</p>
-      <div class="callout"><b>Valuing a Stack.</b> A Stack earns 10% of creator fees. Pump’s creator fee is a small percentage of every trade, so a Stack’s income tracks the coin’s trading volume. No volume, no fees.</div>
+      <p>Today a Spot changes hands in two ways: buying it in the auction, or its owner sending it with <code>transfer_stack</code>. Use <em>Send</em> in My Spots. The Spot moves together with any SOL still unclaimed in its vault, so claim first if you want to keep that.</p>
+      <p>Because a send is one signed transaction, two people can trade a Spot over the counter: the buyer pays, the seller sends. That needs trust between them. An on-chain order book, where a sale and the payment settle in one transaction, is the next thing on the roadmap.</p>
+      <div class="callout"><b>Valuing a Spot.</b> A Spot earns 10% of creator fees. Pump’s creator fee is a small percentage of every trade, so a Spot’s income tracks the coin’s trading volume. No volume, no fees.</div>
     </section>
 
     <section id="fees" data-ds>
@@ -211,8 +211,8 @@
         <table class="tbl">
           <thead><tr><th>What</th><th>Who pays</th><th>Amount</th></tr></thead>
           <tbody>
-            <tr><td>Stack sale</td><td>Buyer</td><td>2% of the price, to the treasury. 98% to the creator.</td></tr>
-            <tr><td>Pre-bought Stack</td><td>Creator</td><td>2% of the floor price, per Stack</td></tr>
+            <tr><td>Spot sale</td><td>Buyer</td><td>2% of the price, to the treasury. 98% to the creator.</td></tr>
+            <tr><td>Pre-bought Spot</td><td>Creator</td><td>2% of the floor price, per Spot</td></tr>
             <tr><td>Launch fee</td><td>Creator</td><td>Set in the protocol config. 0 by default.</td></tr>
             <tr><td>Claims &amp; collects</td><td>Caller</td><td>Solana network fee only</td></tr>
             <tr><td>Trading the coin</td><td>Traders</td><td>pump.fun’s own fees. Spot takes nothing from trades.</td></tr>
@@ -228,11 +228,11 @@
       <ul class="ticks">
         <li><strong>Only the real creator can register a coin.</strong> <code>create_launch</code> reads Pump’s bonding curve and requires the signer to be its creator.</li>
         <li><strong>The auction can’t open until fees are locked to the vaults.</strong> <code>open_auction_pump</code> reads Pump’s sharing config and requires all ten vault addresses at 1,000 bps each, an active config, and a revoked admin.</li>
-        <li><strong>Vaults only pay their owner.</strong> <code>claim</code> requires the signer to own that Stack. No one else can withdraw, including the creator and the protocol.</li>
+        <li><strong>Vaults only pay their owner.</strong> <code>claim</code> requires the signer to own that Spot. No one else can withdraw, including the creator and the protocol.</li>
         <li><strong>No overpaying.</strong> <code>take_stack</code> fails if the price is above the maximum you signed.</li>
       </ul>
       <h3>Check it yourself</h3>
-      <p>On Solscan, open the coin’s fee-sharing config (the <code>sharing-config</code> account of Pump’s fee program for the mint). You should see ten shareholders at 1,000 bps each, and the admin revoked. Each shareholder address is a Stack vault derived from <code>["vault", mint, i]</code>.</p>
+      <p>On Solscan, open the coin’s fee-sharing config (the <code>sharing-config</code> account of Pump’s fee program for the mint). You should see ten shareholders at 1,000 bps each, and the admin revoked. Each shareholder address is a Spot vault derived from <code>["vault", mint, i]</code>.</p>
     </section>
 
     <section id="risks" data-ds>
@@ -240,10 +240,10 @@
       <h2>Risks</h2>
       <div class="risk-grid">
         <div class="risk"><b>Unaudited code</b><p>The Spot program has not been audited. Bugs could lose funds.</p></div>
-        <div class="risk"><b>Volume can go to zero</b><p>A Stack only earns while the coin trades. Most coins stop trading.</p></div>
+        <div class="risk"><b>Volume can go to zero</b><p>A Spot only earns while the coin trades. Most coins stop trading.</p></div>
         <div class="risk"><b>Pump can change</b><p>Pump runs its own programs and admin tools, including for community takeovers. Spot can’t prevent changes Pump makes.</p></div>
         <div class="risk"><b>Fees aren’t automatic</b><p>Someone has to press Collect fees. Until then, fees wait at Pump.</p></div>
-        <div class="risk"><b>No order book yet</b><p>Selling a Stack after the auction needs a buyer you trust.</p></div>
+        <div class="risk"><b>No order book yet</b><p>Selling a Spot after the auction needs a buyer you trust.</p></div>
         <div class="risk"><b>Regulation</b><p>Selling shares of an income stream may be regulated where you live.</p></div>
       </div>
     </section>
@@ -258,9 +258,9 @@
           <tbody>
             <tr><td>create_launch</td><td>Registers a coin (creator only), takes the pre-buy fee, sets up ten vaults.</td></tr>
             <tr><td>open_auction_pump</td><td>Verifies Pump’s locked 10 × 10% split, opens the auction. Permissionless.</td></tr>
-            <tr><td>take_stack</td><td>Buys Stack <code>index</code> at the current price, up to <code>max_price</code>.</td></tr>
+            <tr><td>take_stack</td><td>Buys Spot <code>index</code> at the current price, up to <code>max_price</code>.</td></tr>
             <tr><td>claim</td><td>Owner withdraws the vault balance above rent.</td></tr>
-            <tr><td>transfer_stack</td><td>Owner sends a Stack to <code>new_owner</code>.</td></tr>
+            <tr><td>transfer_stack</td><td>Owner sends a Spot to <code>new_owner</code>.</td></tr>
           </tbody>
         </table>
       </div>
@@ -291,19 +291,19 @@ npx vercel dev</code></pre>
       <p class="sec-n">11</p>
       <h2>FAQ</h2>
       <div class="faq">
-        <details><summary>Can the creator take the fees back?</summary><p>No. Once the auction opens, Pump’s fee-sharing list is locked to the ten vaults, and only each Stack’s owner can withdraw from its vault. A creator who pre-bought Stacks earns from those, like any holder.</p></details>
+        <details><summary>Can the creator take the fees back?</summary><p>No. Once the auction opens, Pump’s fee-sharing list is locked to the ten vaults, and only each Spot’s owner can withdraw from its vault. A creator who pre-bought Spots earns from those, like any holder.</p></details>
         <details><summary>Does the coin trade differently from other pump.fun coins?</summary><p>No. It’s a standard pump.fun coin on the same bonding curve, and it graduates to PumpSwap the same way. Only the creator-fee recipient is different.</p></details>
         <details><summary>What happens when the coin graduates?</summary><p>Creator fees from PumpSwap trades still belong to the coin’s sharing config. <em>Collect fees</em> moves them back to Pump and distributes them to the vaults in one go.</p></details>
-        <details><summary>What if nobody buys a Stack?</summary><p>It stays on sale at the floor price. Its vault keeps collecting fees, and the eventual buyer gets them.</p></details>
-        <details><summary>What makes a good narrative?</summary><p>Say why the coin exists and who it’s for, in a sentence or two. Stack buyers are paying for future trading volume, so tell them why people will keep trading it: a community, a running joke, a product, a cause.</p></details>
-        <details><summary>Can I hold more than one Stack?</summary><p>Yes. Take as many as you like, up to all ten.</p></details>
+        <details><summary>What if nobody buys a Spot?</summary><p>It stays on sale at the floor price. Its vault keeps collecting fees, and the eventual buyer gets them.</p></details>
+        <details><summary>What makes a good narrative?</summary><p>Say why the coin exists and who it’s for, in a sentence or two. Spot buyers are paying for future trading volume, so tell them why people will keep trading it: a community, a running joke, a product, a cause.</p></details>
+        <details><summary>Can I hold more than one Spot?</summary><p>Yes. Take as many as you like, up to all ten.</p></details>
         <details><summary>Why one wallet prompt for three transactions?</summary><p>The site asks your wallet to sign all three together, then sends them in order and waits for each to land. They are separate only because together they don’t fit Solana’s size limit for one transaction.</p></details>
       </div>
     </section>
 
     <div class="docs-end card">
-      <div><h2 class="h-lg">Ready to <span class="it">stack?</span></h2><p>Launch a coin, or take a Stack of one that’s already live.</p></div>
-      <div class="hero-ctas"><a class="btn primary lg" href="./#launch">Launch a coin <span class="arr">→</span></a><a class="btn lg" href="./#market">Browse Stacks</a></div>
+      <div><h2 class="h-lg">Claim your <span class="it">spot.</span></h2><p>Launch a coin, or take a Spot in one that’s already live.</p></div>
+      <div class="hero-ctas"><a class="btn primary lg" href="./#launch">Launch a coin <span class="arr">→</span></a><a class="btn lg" href="./#market">Browse Spots</a></div>
     </div>
   </article>
 </div>

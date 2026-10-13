@@ -17,9 +17,9 @@ export function friendly(err: unknown): string {
   const m = String((err as { message?: string })?.message ?? err);
   if (/User rejected|rejected the request|cancel/i.test(m)) return "Cancelled in your wallet.";
   if (/PriceAboveMax|0x1780|6016/.test(m)) return "The price moved before your transaction landed. Try again.";
-  if (/StackTaken|6015|0x177f/i.test(m)) return "Someone took that Stack first. Try the next one.";
+  if (/StackTaken|6015|0x177f/i.test(m)) return "Someone took that Spot first. Try the next one.";
   if (/NothingToClaim|6018|0x1782/i.test(m)) return "Nothing to claim yet. Collect fees first.";
-  if (/NotStackOwner|6017|0x1781/i.test(m)) return "That Stack isn’t in this wallet.";
+  if (/NotStackOwner|6017|0x1781/i.test(m)) return "That Spot isn’t in this wallet.";
   if (/Invalid public key|Non-base58/i.test(m)) return "That doesn’t look like a Solana address.";
   if (/insufficient lamports|insufficient funds|0x1\b/i.test(m)) return "Not enough SOL in your wallet for this.";
   if (/blockhash not found|block height exceeded|expired/i.test(m)) return "The network was slow and the transaction expired. Try again.";

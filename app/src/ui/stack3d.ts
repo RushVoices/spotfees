@@ -1,4 +1,4 @@
-// The 3D Stack: ten beveled coins, one per Stack of a token's creator fees.
+// The 3D Spot: ten beveled coins, one per Spot of a token's creator fees.
 // Green jade coins are still for sale, pearl ones are taken. Fee "sparks"
 // spiral up into the stack. Scroll fans the coins into a helix; hovering a
 // coin pulls it out.
@@ -47,7 +47,7 @@ function coinProfile(): THREE.Vector2[] {
   return pts;
 }
 
-/** Engraved face: guilloché rings, the Stack number and a tiny legend. */
+/** Engraved face: guilloché rings, the Spot number and a tiny legend. */
 function faceTexture(i: number, taken: boolean): THREE.CanvasTexture {
   const s = 512;
   const c = document.createElement("canvas");
@@ -83,7 +83,7 @@ function faceTexture(i: number, taken: boolean): THREE.CanvasTexture {
   g.font = `italic 400 ${s * 0.22}px "Instrument Serif", Georgia, serif`;
   g.fillText(String(i + 1).padStart(2, "0"), 0, s * 0.01);
   g.font = `500 ${s * 0.034}px "Geist Mono", ui-monospace, monospace`;
-  g.fillText("STACK · 10% OF FEES", 0, s * 0.2);
+  g.fillText("SPOT · 10% OF FEES", 0, s * 0.2);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 8;

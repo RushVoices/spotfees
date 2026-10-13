@@ -1,4 +1,4 @@
-// Landing page: hero 3D stack, auction chart, market, My Stacks, launch form.
+// Landing page: hero 3D stack, auction chart, market, My Spots, launch form.
 // Talks to Solana through window.StacksChain (src/main.ts), which is loaded
 // after window.StacksUI is defined so live data can flow straight in.
 
@@ -58,7 +58,7 @@ let hero: StackHandle | null = null;
         tip.hidden = false;
         tip.style.left = x + "px";
         tip.style.top = y + "px";
-        tip.innerHTML = `<b>${pad(i + 1)}</b>Stack · 10% of fees · <span>${i < sold ? "taken" : "for sale"}</span>`;
+        tip.innerHTML = `<b>${pad(i + 1)}</b>Spot · 10% of fees · <span>${i < sold ? "taken" : "for sale"}</span>`;
       },
     });
   } else {
@@ -86,17 +86,17 @@ let hero: StackHandle | null = null;
 
 /* =============================== TICKER =============================== */
 const SAMPLE = [
-  { name: "Gigachad Cat", sym: "GIGA", mode: "degen" as ModeKey, sold: 7, hue: "#d9f7e8", story: "The cat that never skips leg day. Ten Stacks for the ten loudest believers in the timeline." },
-  { name: "Moon Committee", sym: "MOONC", mode: "builder" as ModeKey, sold: 3, hue: "#e8f6c9", story: "A DAO that votes on one thing: when moon. Stack holders fund the memes and share the fees." },
-  { name: "Tiny Frog Club", sym: "TFC", mode: "degen" as ModeKey, sold: 9, hue: "#cdf3e2", story: "Small frog, big pond. A members-only club where the ten Stack holders run the vibes." },
+  { name: "Gigachad Cat", sym: "GIGA", mode: "degen" as ModeKey, sold: 7, hue: "#d9f7e8", story: "The cat that never skips leg day. Ten Spots for the ten loudest believers in the timeline." },
+  { name: "Moon Committee", sym: "MOONC", mode: "builder" as ModeKey, sold: 3, hue: "#e8f6c9", story: "A DAO that votes on one thing: when moon. Spot holders fund the memes and share the fees." },
+  { name: "Tiny Frog Club", sym: "TFC", mode: "degen" as ModeKey, sold: 9, hue: "#cdf3e2", story: "Small frog, big pond. A members-only club where the ten Spot holders run the vibes." },
   { name: "Solar Punks", sym: "SOLP", mode: "builder" as ModeKey, sold: 1, hue: "#e2f3ea", story: "Building a sunlit future on Solana. Fees from every trade go to the ten people building it." },
-  { name: "Dog With Hat", sym: "HAT", mode: "degen" as ModeKey, sold: 10, hue: "#f0f7d8", story: "He kept the hat. All ten Stacks sold in four minutes." },
-  { name: "Long Bread", sym: "LOAF", mode: "degen" as ModeKey, sold: 4, hue: "#d6f0ff", story: "The longest loaf on-chain. Every trade adds a slice to the ten Stack vaults." },
+  { name: "Dog With Hat", sym: "HAT", mode: "degen" as ModeKey, sold: 10, hue: "#f0f7d8", story: "He kept the hat. All ten Spots sold in four minutes." },
+  { name: "Long Bread", sym: "LOAF", mode: "degen" as ModeKey, sold: 4, hue: "#d6f0ff", story: "The longest loaf on-chain. Every trade adds a slice to the ten Spot vaults." },
 ];
 function renderTicker(items: { sym: string; sold: number; mode: ModeKey }[]) {
   const one = items.map((l, i) => {
     const px = priceAt(l.mode, ((i * 37) % 8) * STEP_MS);
-    return `<span class="tick"><span class="sep"></span><b>$${esc(l.sym)}</b> Stack <span class="it">${pad(Math.max(1, Math.min(10, l.sold)))}</span> taken at <b>${fmt(px)} SOL</b></span>`;
+    return `<span class="tick"><span class="sep"></span><b>$${esc(l.sym)}</b> Spot <span class="it">${pad(Math.max(1, Math.min(10, l.sold)))}</span> taken at <b>${fmt(px)} SOL</b></span>`;
   }).join("");
   $("#ticker").innerHTML = one + one;
 }
@@ -219,13 +219,13 @@ function cardHTML(l: Launch) {
     <div class="lc-body">
       <div class="mini-stack" data-ms></div>
       <div class="lc-px">
-        <span class="mono">${sold ? "Sold out" : `Stack ${pad(l.nextIndex + 1)} price`}</span>
+        <span class="mono">${sold ? "Sold out" : `Spot ${pad(l.nextIndex + 1)} price`}</span>
         <b data-px>${sold ? "—" : fmt(priceAt(l.mode, performance.now() - l.t0))}<small> SOL</small></b>
         <div class="drop-bar"><i data-bar></i></div>
         <div class="meta"><span data-sold>${Math.min(10, l.sold)} of 10 taken</span><span data-next></span></div>
       </div>
     </div>
-    <button class="btn ${sold ? "" : "primary"}" type="button" data-take ${sold ? "disabled" : ""}>${sold ? "All ten Stacks taken" : `Take Stack ${pad(l.nextIndex + 1)}`} ${sold ? "" : '<span class="arr">→</span>'}</button>
+    <button class="btn ${sold ? "" : "primary"}" type="button" data-take ${sold ? "disabled" : ""}>${sold ? "All ten Spots taken" : `Take Spot ${pad(l.nextIndex + 1)}`} ${sold ? "" : '<span class="arr">→</span>'}</button>
   </article>`;
 }
 function renderGrid() {
@@ -269,14 +269,14 @@ $("#grid").addEventListener("click", (e) => {
     const old = b.innerHTML;
     b.disabled = true; b.textContent = "Confirm in your wallet…";
     window.StacksChain!.take(l.mint, l.nextIndex, price)
-      .then(() => toast(`Stack ${pad(l.nextIndex + 1)} of $${l.sym} is yours at ${fmt(price)} SOL`))
+      .then(() => toast(`Spot ${pad(l.nextIndex + 1)} of $${l.sym} is yours at ${fmt(price)} SOL`))
       .catch((err) => toast(friendly(err)))
       .finally(() => { b.disabled = false; b.innerHTML = old; });
     return;
   }
   const p = priceAt(l.mode, performance.now() - l.t0);
   l.sold += 1; l.nextIndex = l.sold; l.t0 = performance.now();
-  toast(`Preview: took Stack ${pad(l.sold)} of $${l.sym} at ${fmt(p)} SOL`);
+  toast(`Preview: took Spot ${pad(l.sold)} of $${l.sym} at ${fmt(p)} SOL`);
   renderTabs(); renderGrid();
   const fresh = $(`#grid .lc[data-id="${l.id}"]`);
   if (fresh) {
@@ -313,14 +313,14 @@ async function connectWallet(): Promise<boolean> {
 }
 $("#walletBtn").addEventListener("click", () => { if (!address) connectWallet(); });
 
-/* =============================== MY STACKS =============================== */
+/* =============================== MY SPOTS =============================== */
 type MineRow = { mint: string; name: string; sym: string; index: number; claimable: number; venue: string };
 function renderMine(rows: MineRow[] | null) {
   const box = $("#mineList");
-  if (rows === null) { box.innerHTML = `<div class="empty">Connect your wallet to see the Stacks you hold. <br><br><button class="btn dark sm" type="button" data-connect>Connect wallet</button></div>`; return; }
-  if (!rows.length) { box.innerHTML = `<div class="empty">You don’t hold any Stacks yet. <a href="#market">Take one</a>.</div>`; return; }
+  if (rows === null) { box.innerHTML = `<div class="empty">Connect your wallet to see the Spots you hold. <br><br><button class="btn dark sm" type="button" data-connect>Connect wallet</button></div>`; return; }
+  if (!rows.length) { box.innerHTML = `<div class="empty">You don’t hold any Spots yet. <a href="#market">Take one</a>.</div>`; return; }
   box.innerHTML = rows.map((r) => `<div class="card mine-row" data-mint="${esc(r.mint)}" data-index="${r.index}">
-      <div style="min-width:0"><b class="t">$${esc(r.sym)} · Stack ${pad(r.index + 1)}</b><span class="mono">${esc(r.name)}</span></div>
+      <div style="min-width:0"><b class="t">$${esc(r.sym)} · Spot ${pad(r.index + 1)}</b><span class="mono">${esc(r.name)}</span></div>
       <div class="mine-amt"><b>${r.claimable.toFixed(4)}</b> <small>SOL ready</small></div>
       <div class="mine-act">
         <button class="btn sm" type="button" data-collect>Collect fees</button>
@@ -339,11 +339,11 @@ $("#mineList").addEventListener("click", (e) => {
   const chain = window.StacksChain!;
   let job: Promise<unknown>; let done: string;
   if (b.hasAttribute("data-send")) {
-    const to = prompt("Send this Stack, and its unclaimed SOL, to which wallet address?")?.trim();
+    const to = prompt("Send this Spot, and its unclaimed SOL, to which wallet address?")?.trim();
     if (!to) return;
-    job = chain.transfer(mint, index, to); done = "Stack sent";
+    job = chain.transfer(mint, index, to); done = "Spot sent";
   } else if (b.hasAttribute("data-claim")) { job = chain.claim(mint, index); done = "Claimed to your wallet"; }
-  else { job = chain.collectFees(mint); done = "Fees paid into all ten Stacks"; }
+  else { job = chain.collectFees(mint); done = "Fees paid into all ten Spots"; }
   const old = b.innerHTML; b.disabled = true; b.textContent = "Confirm in wallet…";
   job.then(() => toast(done)).catch((err) => toast(friendly(err))).finally(() => { b.disabled = false; b.innerHTML = old; });
 });
@@ -443,8 +443,8 @@ $("#mineList").addEventListener("click", (e) => {
     const labels = [
       "Uploading image and metadata",
       `Creating $${sym} on pump.fun`,
-      "Registering the Stacks and turning on fee sharing",
-      "Locking fees to the ten Stacks and opening the auction",
+      "Registering the Spots and turning on fee sharing",
+      "Locking fees to the ten Spots and opening the auction",
     ];
     const ol = $("#progress");
     ol.hidden = false;
@@ -462,7 +462,7 @@ $("#mineList").addEventListener("click", (e) => {
       step(items.length);
       const box = $("#doneBox");
       box.hidden = false;
-      box.innerHTML = `<b>$${esc(sym)} is live.</b> ${10 - f.pre} Stacks are up for auction. <a href="${esc(r.explorer)}" target="_blank" rel="noopener">View transaction</a> · <a href="https://pump.fun/coin/${esc(r.mint)}" target="_blank" rel="noopener">Open on pump.fun</a><br><span class="mono" style="text-transform:none">${esc(r.mint)}</span>`;
+      box.innerHTML = `<b>$${esc(sym)} is live.</b> ${10 - f.pre} Spots are up for auction. <a href="${esc(r.explorer)}" target="_blank" rel="noopener">View transaction</a> · <a href="https://pump.fun/coin/${esc(r.mint)}" target="_blank" rel="noopener">Open on pump.fun</a><br><span class="mono" style="text-transform:none">${esc(r.mint)}</span>`;
       toast("Launched");
       hero?.setSold(f.pre, false);
     } catch (err) {
@@ -486,7 +486,7 @@ window.StacksUI = {
       id: i, live: true, mint: l.mint, name: l.name, sym: l.sym, image: l.image, story: l.story, mode: l.mode,
       sold: l.sold, status: l.status, nextIndex: l.nextIndex, hue: l.hue, t0: l.t0,
     }));
-    $("#gridNote").textContent = "Live. Prices drop every 15 seconds and restart after each take. Taking a Stack is one transaction from your wallet.";
+    $("#gridNote").textContent = "Live. Prices drop every 15 seconds and restart after each take. Taking a Spot is one transaction from your wallet.";
     if (launches.length) renderTicker(launches);
     renderTabs(); renderGrid();
   },

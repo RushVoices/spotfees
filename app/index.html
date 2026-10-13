@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Spot — own a share of a token's creator fees</title>
-<meta name="description" content="Turn a pump.fun token's creator fees into ten Stacks. Buy a share. Earn as it trades.">
+<meta name="description" content="Turn a pump.fun token's creator fees into ten Spots. Buy a share. Earn as it trades.">
 <meta name="theme-color" content="#ffffff">
 <meta property="og:title" content="Spot">
-<meta property="og:description" content="Turn a token's creator fees into ten Stacks. Buy a share. Earn as it trades.">
+<meta property="og:description" content="Turn a token's creator fees into ten Spots. Buy a share. Earn as it trades.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
     <a href="#how">How it works</a>
     <a href="#market">Market</a>
     <a href="#launch">Launch</a>
-    <a href="#mine" class="live-only">My Stacks</a>
+    <a href="#mine" class="live-only">My Spots</a>
     <a href="docs.html">Docs</a>
   </nav>
   <div class="nav-cta">
@@ -63,21 +63,21 @@
           <span>Creator fees, split ten ways</span>
           <span class="arr">→</span>
         </a>
-        <h1 class="h-xl hero-h split" data-split>Turn a token’s creator fees into <span class="it green-text">ten Stacks.</span></h1>
-        <p class="lede rv" style="--d:.35s">Buy a share. Earn as it trades. Every Stack is a permanent 10% of a coin’s pump.fun creator fees, locked on-chain and paid out in SOL.</p>
+        <h1 class="h-xl hero-h split" data-split>Turn a token’s creator fees into <span class="it green-text">ten Spots.</span></h1>
+        <p class="lede rv" style="--d:.35s">Buy a share. Earn as it trades. Every Spot is a permanent 10% of a coin’s pump.fun creator fees, locked on-chain and paid out in SOL.</p>
         <div class="hero-ctas rv" style="--d:.45s">
           <a class="btn primary lg" href="#launch">Launch on pump.fun <span class="arr">→</span></a>
-          <a class="btn lg" href="#market">Browse Stacks</a>
+          <a class="btn lg" href="#market">Browse Spots</a>
         </div>
         <ul class="hero-proof rv" style="--d:.55s">
-          <li><b>10</b><span>Stacks per token</span></li>
+          <li><b>10</b><span>Spots per token</span></li>
           <li><b>10%</b><span>of fees, each</span></li>
           <li><b>1</b><span>wallet prompt to launch</span></li>
         </ul>
       </div>
 
       <div class="hero-stage" id="stage">
-        <canvas id="stackCanvas" aria-label="A 3D stack of ten coins, one per Stack. Green coins are for sale, white ones are taken."></canvas>
+        <canvas id="stackCanvas" aria-label="A 3D stack of ten coins, one per Spot. Green coins are for sale, white ones are taken."></canvas>
         <div class="css-stack" id="cssStack" aria-hidden="true" hidden></div>
         <div class="float-chip fc-1" id="chipFees">
           <span class="mono">Fees streamed</span>
@@ -86,7 +86,7 @@
         </div>
         <div class="float-chip fc-2" id="chipTake">
           <span class="mono">Just taken</span>
-          <b>Stack <span id="takeNo" class="it">04</span> · <span id="takePx">0.875</span> <small>SOL</small></b>
+          <b>Spot <span id="takeNo" class="it">04</span> · <span id="takePx">0.875</span> <small>SOL</small></b>
         </div>
         <div class="float-chip fc-3">
           <span class="ring" aria-hidden="true"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" /><circle id="soldRing" cx="18" cy="18" r="15" /></svg><b id="soldN">3</b></span>
@@ -109,9 +109,9 @@
       <p class="kicker rv">Why Spot</p>
       <p class="story-lede rv">On pump.fun, every trade pays the coin’s creator. <span class="muted">One wallet, for as long as the coin lives.</span> Spot turns that one seat into <span class="it hl">ten.</span> Creators get paid on day one by selling their future fees. Believers get a <span class="it hl">spot</span> in the coin they back, and are paid every time it trades.</p>
       <div class="story-cols">
-        <div class="rv"><span class="mono">For creators</span><h3>Get paid on day one.</h3><p>Sell up to ten Stacks of your fee stream at auction instead of waiting months for fees to trickle in. Keep up to five for yourself.</p></div>
-        <div class="rv" style="--d:.08s"><span class="mono">For holders</span><h3>Own the volume, not just the chart.</h3><p>A Stack earns on every buy and every sell. Red day or green day, if people trade the coin, your vault fills.</p></div>
-        <div class="rv" style="--d:.16s"><span class="mono">For the coin</span><h3>Ten owners who want it to trade.</h3><p>Stack holders have a direct reason to grow the community, post, and keep volume alive. The coin gets ten backers, not one dev.</p></div>
+        <div class="rv"><span class="mono">For creators</span><h3>Get paid on day one.</h3><p>Sell up to ten Spots of your fee stream at auction instead of waiting months for fees to trickle in. Keep up to five for yourself.</p></div>
+        <div class="rv" style="--d:.08s"><span class="mono">For holders</span><h3>Own the volume, not just the chart.</h3><p>A Spot earns on every buy and every sell. Red day or green day, if people trade the coin, your vault fills.</p></div>
+        <div class="rv" style="--d:.16s"><span class="mono">For the coin</span><h3>Ten owners who want it to trade.</h3><p>Spot holders have a direct reason to grow the community, post, and keep volume alive. The coin gets ten backers, not one dev.</p></div>
       </div>
     </div>
   </section>
@@ -124,7 +124,7 @@
           <p class="kicker rv">How it works <b>(01)</b></p>
           <h2 class="h-lg split" data-split>One coin. One fee stream. <span class="it">Ten owners.</span></h2>
         </div>
-        <p class="lede rv">When a coin launches through Spot, its pump.fun creator fees are wired to ten on-chain vaults at 10% each. Pump locks that split forever. Then the ten Stacks go up for auction.</p>
+        <p class="lede rv">When a coin launches through Spot, its pump.fun creator fees are wired to ten on-chain vaults at 10% each. Pump locks that split forever. Then the ten Spots go up for auction.</p>
       </div>
 
       <div class="steps">
@@ -145,7 +145,7 @@
           </div>
           <span class="step-n">01</span>
           <h3>Launch your coin</h3>
-          <p>Create a coin on pump.fun from this page. One wallet prompt creates it, turns on fee sharing, and sends the creator fees to ten Stack vaults, 10% each. Pump locks the split.</p>
+          <p>Create a coin on pump.fun from this page. One wallet prompt creates it, turns on fee sharing, and sends the creator fees to ten Spot vaults, 10% each. Pump locks the split.</p>
         </article>
 
         <article class="card tilt step rv" style="--d:.1s">
@@ -160,8 +160,8 @@
             </svg>
           </div>
           <span class="step-n">02</span>
-          <h3>Ten Stacks, one auction</h3>
-          <p>Each Stack opens at a start price that drops every 15 seconds down to a floor. Take one when the price feels right. After every take the price restarts for the next Stack.</p>
+          <h3>Ten Spots, one auction</h3>
+          <p>Each Spot opens at a start price that drops every 15 seconds down to a floor. Take one when the price feels right. After every take the price restarts for the next Spot.</p>
         </article>
 
         <article class="card tilt step rv" style="--d:.2s">
@@ -181,7 +181,7 @@
           </div>
           <span class="step-n">03</span>
           <h3>Earn as it trades</h3>
-          <p>Every buy and sell of the coin pays creator fees. They land in the ten vaults in equal parts. Claim your share in SOL whenever you like, or send your Stack to someone else.</p>
+          <p>Every buy and sell of the coin pays creator fees. They land in the ten vaults in equal parts. Claim your share in SOL whenever you like, or send your Spot to someone else.</p>
         </article>
       </div>
     </div>
@@ -206,7 +206,7 @@
           <div><span class="mono">Live price</span><div class="chart-price"><b id="chartPx">1.500</b> <small>SOL</small></div></div>
           <div class="chart-next"><span class="mono">Next drop</span><b id="chartNext">15s</b></div>
         </div>
-        <svg id="chart" viewBox="0 0 640 300" role="img" aria-label="Price of a Stack stepping down every 15 seconds from the start price to the floor"></svg>
+        <svg id="chart" viewBox="0 0 640 300" role="img" aria-label="Price of a Spot stepping down every 15 seconds from the start price to the floor"></svg>
         <div class="chart-foot mono"><span>0s</span><span>Seconds since the auction opened</span><span id="chartEnd">120s</span></div>
       </div>
     </div>
@@ -215,8 +215,8 @@
   <!-- ================= NUMBERS ================= -->
   <section class="numbers">
     <div class="wrap nums">
-      <div class="num rv"><b data-count="10">10</b><span>Stacks per coin, never more</span></div>
-      <div class="num rv" style="--d:.08s"><b data-count="10" data-suffix="%">10%</b><span>of all creator fees, per Stack</span></div>
+      <div class="num rv"><b data-count="10">10</b><span>Spots per coin, never more</span></div>
+      <div class="num rv" style="--d:.08s"><b data-count="10" data-suffix="%">10%</b><span>of all creator fees, per Spot</span></div>
       <div class="num rv" style="--d:.16s"><b data-count="15" data-suffix="s">15s</b><span>between price drops</span></div>
       <div class="num rv" style="--d:.24s"><b data-count="2" data-suffix="%">2%</b><span>protocol fee on sales</span></div>
     </div>
@@ -228,9 +228,9 @@
       <div class="sec-head">
         <div>
           <p class="kicker rv">Market <b>(03)</b></p>
-          <h2 class="h-lg split" data-split>Stacks <span class="it">on the block.</span></h2>
+          <h2 class="h-lg split" data-split>Spots <span class="it">on the block.</span></h2>
         </div>
-        <p class="lede rv" id="marketLede">Every coin launched through Spot shows up here. Watch the price tick down, then take the next Stack in one click.</p>
+        <p class="lede rv" id="marketLede">Every coin launched through Spot shows up here. Watch the price tick down, then take the next Spot in one click.</p>
       </div>
       <div class="market-bar rv">
         <div class="tabs" id="tabs" role="tablist" aria-label="Filter launches"></div>
@@ -247,9 +247,9 @@
       <div class="sec-head">
         <div>
           <p class="kicker">Portfolio</p>
-          <h2 class="h-lg">My <span class="it">Stacks.</span></h2>
+          <h2 class="h-lg">My <span class="it">Spots.</span></h2>
         </div>
-        <p class="lede">Collect pays every vault its share of the fees so far. Claim sends your vault’s SOL to your wallet. Send moves a Stack, with its unclaimed SOL, to another wallet.</p>
+        <p class="lede">Collect pays every vault its share of the fees so far. Claim sends your vault’s SOL to your wallet. Send moves a Spot, with its unclaimed SOL, to another wallet.</p>
       </div>
       <div class="mine-list" id="mineList"></div>
     </div>
@@ -264,7 +264,7 @@
           <p class="kicker rv">Launch <b>(04)</b></p>
           <h2 class="h-lg split" data-split>Launch a coin. <span class="it">Sell its future.</span></h2>
         </div>
-        <p class="lede rv">Your coin goes live on pump.fun with its creator fees split into ten Stacks. You keep the auction proceeds, minus a 2% protocol fee, and can pre-buy up to five Stacks for yourself.</p>
+        <p class="lede rv">Your coin goes live on pump.fun with its creator fees split into ten Spots. You keep the auction proceeds, minus a 2% protocol fee, and can pre-buy up to five Spots for yourself.</p>
       </div>
 
       <div class="launch-grid">
@@ -283,7 +283,7 @@
                 <img id="dropImg" alt="" hidden>
               </label>
             </div>
-            <div class="field"><label for="tDesc">Narrative <small id="descCt">0/500</small></label><textarea class="in" id="tDesc" maxlength="500" placeholder="The story of your coin. Why it exists, who it’s for, why people should hold a Stack."></textarea><p class="hint">Shown on pump.fun, in wallets, and on your coin’s card here.</p></div>
+            <div class="field"><label for="tDesc">Narrative <small id="descCt">0/500</small></label><textarea class="in" id="tDesc" maxlength="500" placeholder="The story of your coin. Why it exists, who it’s for, why people should hold a Spot."></textarea><p class="hint">Shown on pump.fun, in wallets, and on your coin’s card here.</p></div>
             <details class="socials">
               <summary>Socials <small>optional</small></summary>
               <div class="row-3">
@@ -311,10 +311,10 @@
           </fieldset>
 
           <fieldset>
-            <legend><span class="step-n">03</span> Keep some Stacks</legend>
+            <legend><span class="step-n">03</span> Keep some Spots</legend>
             <div class="prebuy">
               <div>
-                <p class="hint">Pre-buy Stacks for yourself. You pay only the 2% fee on the floor price; the rest go to auction.</p>
+                <p class="hint">Pre-buy Spots for yourself. You pay only the 2% fee on the floor price; the rest go to auction.</p>
                 <div class="stepper"><button type="button" id="preMinus" aria-label="Fewer">−</button><output id="preN" aria-live="polite">2</output><button type="button" id="prePlus" aria-label="More">+</button></div>
               </div>
               <div class="preseg" id="preSeg" aria-hidden="true"></div>
@@ -341,12 +341,12 @@
             <p class="pv-story" id="pvStory">Your coin’s narrative shows up here.</p>
             <div class="pv-stage"><div class="mini-stack big" id="pvStack"></div></div>
             <dl class="sum">
-              <div><dt>Stacks for auction</dt><dd id="sAuc">8 of 10</dd></div>
+              <div><dt>Spots for auction</dt><dd id="sAuc">8 of 10</dd></div>
               <div><dt>Pre-buy fee</dt><dd id="sPre">0.0200 SOL</dd></div>
               <div><dt>Dev buy</dt><dd id="sDev">0 SOL</dd></div>
               <div><dt>Network &amp; rent, about</dt><dd>0.03 SOL</dd></div>
               <div class="total"><dt>Total, about</dt><dd id="sTotal">0.05 SOL</dd></div>
-              <div class="earn"><dt>If all Stacks sell at the floor</dt><dd id="sEarn">3.92 SOL to you</dd></div>
+              <div class="earn"><dt>If all Spots sell at the floor</dt><dd id="sEarn">3.92 SOL to you</dd></div>
             </dl>
             <button class="btn primary lg launch-btn" id="launchBtn" type="button">Launch on pump.fun <span class="arr">→</span></button>
             <p class="help" id="help">One wallet prompt signs every step.</p>
@@ -380,7 +380,7 @@
         <a class="brand" href="#top"><svg class="brand-mark"><use href="#brandmark"/></svg><span class="brand-word">Sp<i>o</i>t</span></a>
         <p class="foot-tag">Buy a share. <i>Earn as it trades.</i></p>
       </div>
-      <div><h4>Product</h4><ul><li><a href="#market">Market</a></li><li><a href="#launch">Launch</a></li><li><a href="#mine">My Stacks</a></li></ul></div>
+      <div><h4>Product</h4><ul><li><a href="#market">Market</a></li><li><a href="#launch">Launch</a></li><li><a href="#mine">My Spots</a></li></ul></div>
       <div><h4>Learn</h4><ul><li><a href="docs.html">Docs</a></li><li><a href="docs.html#auction">The auction</a></li><li><a href="docs.html#risks">Risks</a></li></ul></div>
       <div><h4>On-chain</h4><ul><li><a href="docs.html#developers">Program</a></li><li><a href="https://github.com/pump-fun/pump-public-docs" target="_blank" rel="noopener">Pump docs</a></li><li><a href="docs.html#faq">FAQ</a></li></ul></div>
     </div>

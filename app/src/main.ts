@@ -187,7 +187,7 @@ const api = {
     return sigs;
   },
 
-  /** Takes Stack `index` of `mint`, paying at most `maxSol`. */
+  /** Takes Spot `index` of `mint`, paying at most `maxSol`. */
   async take(mint: string, index: number, maxSol: number) {
     const c = need();
     const me = walletKey() ?? (await connectWallet());
@@ -219,7 +219,7 @@ const api = {
     return sigs;
   },
 
-  /** Moves Stack `index` (and its unclaimed SOL) to another wallet. */
+  /** Moves Spot `index` (and its unclaimed SOL) to another wallet. */
   async transfer(mint: string, index: number, to: string) {
     const c = need();
     const me = walletKey() ?? (await connectWallet());
