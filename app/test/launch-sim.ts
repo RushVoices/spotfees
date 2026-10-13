@@ -108,7 +108,10 @@ const coder = new BorshAccountsCoder(pumpIdl as never);
     check(JSON.stringify(progs(tx2)) === '["pump","spot","pump-fees"]', `tx ${sent.length - 1}: sweep → create_launch → create_fee_sharing_config (${progs(tx2).join(", ")})`);
     check(JSON.stringify(progs(tx3)) === '["pump","pump-fees","spot"]', `tx ${sent.length}: sweep → update_fee_shares_v2 → open_auction_pump (${progs(tx3).join(", ")})`);
   }
-  // Plain pump.fun launch (Spot program not live yet): one transaction.
+  // Plain pump.fun launch (Spot program not live yet): one transaction,
+  // through signAndSendTransaction like Phantom.
+  const ph = (g.window as { phantom: { solana: Record<string, unknown> } }).phantom.solana;
+  ph.signAndSendTransaction = async (t: Transaction) => { t.partialSign(user); sent.push(t); return { signature: `sig${sent.length}` }; };
   for (const [label, devBuy] of [["direct: no dev buy", 0n], ["direct: 1 SOL dev buy", BigInt(LAMPORTS_PER_SOL)]] as const) {
     console.log(`\n${label}`);
     sent.length = 0;

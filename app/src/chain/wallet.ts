@@ -7,6 +7,8 @@ interface InjectedWallet {
   connect(): Promise<{ publicKey: PublicKey }>;
   disconnect(): Promise<void>;
   signAllTransactions<T extends Transaction>(txs: T[]): Promise<T[]>;
+  /** Phantom's recommended API: the wallet signs and submits in one step. */
+  signAndSendTransaction?(tx: Transaction): Promise<{ signature: string }>;
 }
 
 declare global {
@@ -56,6 +58,14 @@ export async function signAndSendSequential(
     const extra = extraSigners[i];
     if (extra?.length) tx.partialSign(...extra);
   });
+  // One transaction: let the wallet sign and send it (Phantom's recommended
+  // flow; wallets warn less than for sign-only requests).
+  if (txs.length === 1 && wallet.signAndSendTransaction) {
+    const { signature } = await wallet.signAndSendTransaction(txs[0]);
+    await confirmByPolling(conn, signature, null, lastValidBlockHeight, 0);
+    onStep?.(0, signature);
+    return [signature];
+  }
   const signed = await wallet.signAllTransactions(txs);
   const sigs: string[] = [];
   for (let i = 0; i < signed.length; i++) {
@@ -73,7 +83,7 @@ export async function signAndSendSequential(
  * through the site's /api/rpc route), re-sending it every few seconds until
  * it lands or its blockhash expires.
  */
-async function confirmByPolling(conn: Connection, sig: string, raw: Buffer | Uint8Array, lastValidBlockHeight: number, i: number) {
+async function confirmByPolling(conn: Connection, sig: string, raw: Buffer | Uint8Array | null, lastValidBlockHeight: number, i: number) {
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   for (let n = 0; ; n++) {
     await sleep(1000);
@@ -82,7 +92,7 @@ async function confirmByPolling(conn: Connection, sig: string, raw: Buffer | Uin
     if (st && (st.confirmationStatus === "confirmed" || st.confirmationStatus === "finalized")) return;
     if (n % 3 === 2) {
       if ((await conn.getBlockHeight("confirmed")) > lastValidBlockHeight) throw new Error("Transaction expired: block height exceeded. Try again.");
-      conn.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 }).catch(() => {});
+      if (raw) conn.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 }).catch(() => {});
     }
   }
 }
