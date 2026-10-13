@@ -6,7 +6,7 @@ import { Keypair, PublicKey, Transaction, LAMPORTS_PER_SOL, ComputeBudgetProgram
 import { BorshAccountsCoder } from "@coral-xyz/anchor";
 import BN from "bn.js";
 import { pumpIdl, GLOBAL_PDA, PUMP_FEE_CONFIG_PDA, PUMP_PROGRAM_ID, PUMP_FEE_PROGRAM_ID } from "@pump-fun/pump-sdk";
-import { launchOnPump } from "../src/chain/pump";
+import { launchOnPump, launchPumpDirect } from "../src/chain/pump";
 import { programId, Mode } from "../src/chain/stacks";
 
 let failures = 0;
@@ -106,6 +106,21 @@ const coder = new BorshAccountsCoder(pumpIdl as never);
     const tx2 = sent[sent.length - 2], tx3 = sent[sent.length - 1];
     check(JSON.stringify(progs(tx2)) === '["pump","spot","pump-fees"]', `tx ${sent.length - 1}: sweep → create_launch → create_fee_sharing_config (${progs(tx2).join(", ")})`);
     check(JSON.stringify(progs(tx3)) === '["pump","pump-fees","spot"]', `tx ${sent.length}: sweep → update_fee_shares_v2 → open_auction_pump (${progs(tx3).join(", ")})`);
+  }
+  // Plain pump.fun launch (Spot program not live yet): one transaction.
+  for (const [label, devBuy] of [["direct: no dev buy", 0n], ["direct: 1 SOL dev buy", BigInt(LAMPORTS_PER_SOL)]] as const) {
+    console.log(`\n${label}`);
+    sent.length = 0;
+    const steps: number[] = [];
+    const r = await launchPumpDirect(conn as never, user.publicKey, { name: "Gigachad Cat", symbol: "GIGA", uri: longUri, devBuyLamports: devBuy }, (i) => steps.push(i));
+    check(sent.length === 1, `${sent.length} transaction, one wallet prompt`);
+    check(JSON.stringify(steps) === "[0]", `progress steps ${JSON.stringify(steps)}`);
+    const t = sent[0];
+    check(t.serialize().length <= 1232 && t.verifySignatures(), `${t.serialize().length} bytes, fully signed`);
+    check(t.signatures.some((x) => x.publicKey.equals(r.mint)), "signed by the new mint");
+    check(t.instructions.every((ix) => !ix.programId.equals(programId())), "no Spot program instructions");
+    const pumpIxs = t.instructions.filter((ix) => ix.programId.equals(PUMP_PROGRAM_ID)).length;
+    check(pumpIxs === (devBuy > 0n ? 2 : 1), devBuy > 0n ? "create + dev buy in the same transaction" : "create only");
   }
   console.log(failures ? `\n${failures} check(s) failed` : "\nAll launch checks passed");
   process.exit(failures ? 1 : 0);

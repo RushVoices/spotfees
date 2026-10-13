@@ -321,3 +321,10 @@ html:not(.is-live) .live-only { display: none; }
 .pv-story { margin: 0; font-family: var(--serif); font-style: italic; font-size: 1.15rem; line-height: 1.4; color: var(--ink-2); overflow-wrap: anywhere; }
 .pv-story.empty-story { color: var(--mute); }
 .lc-story { margin: -4px 0 0; color: var(--ink-2); font-size: 0.92rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.9em; overflow-wrap: anywhere; }
+
+/* Spots-only parts of the launch form show once the Spot program is live */
+html:not(.spots-on) .spots-only { display: none !important; }
+html.spots-on .spots-soon { display: none; }
+.spots-soon { margin: 0 0 22px; padding: 14px 16px; border-radius: 14px; background: var(--g-50); border: 1px solid var(--g-100); color: var(--ink-2); font-size: 0.92rem; line-height: 1.55; }
+html:not(.spots-on) .launch-form fieldset + fieldset { border-top: 1px solid var(--line); }
+html.spots-on .not-spots { display: none; }

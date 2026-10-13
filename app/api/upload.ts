@@ -4,7 +4,9 @@
 // Pins the image, then the metadata JSON, to IPFS via Pinata and returns
 // { uri } — the metadata URI Pump/Meteora store on the token.
 //
-// Env: PINATA_JWT (required), PINATA_GATEWAY (optional, e.g. you.mypinata.cloud)
+// Env: PINATA_JWT (optional), PINATA_GATEWAY (optional, e.g. you.mypinata.cloud).
+// Without PINATA_JWT the files go through pump.fun's own IPFS uploader, the
+// one pump.fun uses for its create page, so launching needs no keys at all.
 
 export const config = { runtime: "edge" };
 
@@ -17,7 +19,6 @@ const json = (body: unknown, status = 200) =>
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== "POST") return json({ error: "Use POST" }, 405);
   const jwt = process.env.PINATA_JWT;
-  if (!jwt) return json({ error: "Uploads are not configured (PINATA_JWT is missing)." }, 500);
   const gateway = process.env.PINATA_GATEWAY ? `https://${process.env.PINATA_GATEWAY}/ipfs/` : "https://ipfs.io/ipfs/";
 
   let form: FormData;
@@ -32,6 +33,11 @@ export default async function handler(req: Request): Promise<Response> {
   const name = text("name", 32);
   const symbol = text("symbol", 10);
   if (!name || !symbol) return json({ error: "Name and symbol are required." }, 400);
+
+  if (!jwt) return uploadViaPump(file, {
+    name, symbol, description: text("description", 500),
+    twitter: text("twitter", 200), telegram: text("telegram", 200), website: text("website", 200),
+  });
 
   const pinFile = new FormData();
   pinFile.append("file", file, file.name || "image");
@@ -65,6 +71,23 @@ export default async function handler(req: Request): Promise<Response> {
   const { IpfsHash: metaCid } = (await metaRes.json()) as { IpfsHash: string };
 
   return json({ uri: `${gateway}${metaCid}`, image: metadata.image });
+}
+
+/** pump.fun's IPFS uploader: same form fields as its create page. Returns { metadataUri }. */
+async function uploadViaPump(file: File, f: Record<string, string>): Promise<Response> {
+  const form = new FormData();
+  form.append("file", file, file.name || "image");
+  for (const [k, v] of Object.entries(f)) if (v) form.append(k, v);
+  form.append("showName", "true");
+  let res: Response;
+  try {
+    res = await fetch("https://pump.fun/api/ipfs", { method: "POST", body: form, headers: { origin: "https://pump.fun", referer: "https://pump.fun/create" } });
+  } catch {
+    return json({ error: "Couldn’t reach pump.fun to upload the image. Try again." }, 502);
+  }
+  const body = (await res.json().catch(() => null)) as { metadataUri?: string; metadata?: { image?: string } } | null;
+  if (!res.ok || !body?.metadataUri) return json({ error: `pump.fun image upload failed (${res.status}). Try again, or set PINATA_JWT.` }, 502);
+  return json({ uri: body.metadataUri, image: body.metadata?.image });
 }
 
 declare const process: { env: Record<string, string | undefined> };

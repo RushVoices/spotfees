@@ -294,7 +294,9 @@
             </details>
           </fieldset>
 
-          <fieldset>
+          <p class="spots-soon">Spots are coming soon. Coins you launch now go straight to pump.fun and you keep the creator fees. Once Spots are live, you can open this coin’s ten Spots from the same wallet.</p>
+
+          <fieldset class="spots-only">
             <legend><span class="step-n">02</span> Auction mode</legend>
             <div class="modes" role="radiogroup" aria-label="Auction mode">
               <label class="mode-card"><input type="radio" name="mode" value="degen" checked>
@@ -310,7 +312,7 @@
             </div>
           </fieldset>
 
-          <fieldset>
+          <fieldset class="spots-only">
             <legend><span class="step-n">03</span> Keep some Spots</legend>
             <div class="prebuy">
               <div>
@@ -322,7 +324,7 @@
           </fieldset>
 
           <fieldset>
-            <legend><span class="step-n">04</span> Dev buy <small class="opt">optional</small></legend>
+            <legend><span class="step-n"><span class="spots-only">04</span><span class="not-spots">02</span></span> Dev buy <small class="opt">optional</small></legend>
             <div class="devbuy">
               <div class="sol-in"><input class="in" id="dev" inputmode="decimal" placeholder="0.00"><span>SOL</span></div>
               <div class="quick" id="devQuick"><button type="button" data-v="0">0</button><button type="button" data-v="0.5">0.5</button><button type="button" data-v="1">1</button><button type="button" data-v="2">2</button></div>
@@ -336,20 +338,20 @@
             <div class="pv-head">
               <div class="pv-av" id="pvAv">?</div>
               <div><b id="pvName">Your coin</b><span class="mono" id="pvSym">$TICKER</span></div>
-              <span class="chip g" id="pvMode">Degen</span>
+              <span class="chip g spots-only" id="pvMode">Degen</span>
             </div>
             <p class="pv-story" id="pvStory">Your coin’s narrative shows up here.</p>
             <div class="pv-stage"><div class="mini-stack big" id="pvStack"></div></div>
             <dl class="sum">
-              <div><dt>Spots for auction</dt><dd id="sAuc">8 of 10</dd></div>
-              <div><dt>Pre-buy fee</dt><dd id="sPre">0.0200 SOL</dd></div>
+              <div class="spots-only"><dt>Spots for auction</dt><dd id="sAuc">8 of 10</dd></div>
+              <div class="spots-only"><dt>Pre-buy fee</dt><dd id="sPre">0.0200 SOL</dd></div>
               <div><dt>Dev buy</dt><dd id="sDev">0 SOL</dd></div>
               <div><dt>Network &amp; rent, about</dt><dd>0.03 SOL</dd></div>
               <div class="total"><dt>Total, about</dt><dd id="sTotal">0.05 SOL</dd></div>
-              <div class="earn"><dt>If all Spots sell at the floor</dt><dd id="sEarn">3.92 SOL to you</dd></div>
+              <div class="earn spots-only"><dt>If all Spots sell at the floor</dt><dd id="sEarn">3.92 SOL to you</dd></div>
             </dl>
             <button class="btn primary lg launch-btn" id="launchBtn" type="button">Launch on pump.fun <span class="arr">→</span></button>
-            <p class="help" id="help">One wallet prompt signs every step.</p>
+            <p class="help" id="help">One wallet prompt. You need a Solana wallet like Phantom.</p>
             <ol class="progress" id="progress" hidden></ol>
             <div class="done" id="doneBox" hidden></div>
           </div>

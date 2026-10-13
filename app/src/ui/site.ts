@@ -24,6 +24,7 @@ const stepsOf = (m: ModeKey) => Math.round((MODES[m].start - MODES[m].floor) / M
 initChrome();
 
 const isLive = () => !!window.StacksChain?.live;
+const canLaunch = () => !!window.StacksChain?.canLaunch;
 
 /* =============================== HERO =============================== */
 let hero: StackHandle | null = null;
@@ -298,7 +299,7 @@ function paintWallet() {
 }
 async function connectWallet(): Promise<boolean> {
   try {
-    if (isLive()) address = await window.StacksChain!.connect();
+    if (window.StacksChain) address = await window.StacksChain.connect();
     else {
       const w = (window as unknown as { phantom?: { solana?: { connect(): Promise<{ publicKey: { toString(): string } }> } }; solana?: { connect(): Promise<{ publicKey: { toString(): string } }> } });
       const p = w.phantom?.solana ?? w.solana;
@@ -364,7 +365,7 @@ $("#mineList").addEventListener("click", (e) => {
     $("#preN").textContent = String(f.pre);
     $("#preSeg").innerHTML = Array.from({ length: 5 }, (_, i) => `<span class="${i < f.pre ? "mine" : ""}">${pad(i + 1)}</span>`).join("");
     const m = MODES[f.mode];
-    const preFee = f.pre * m.floor * PROTOCOL_FEE;
+    const preFee = document.documentElement.classList.contains("spots-on") ? f.pre * m.floor * PROTOCOL_FEE : 0;
     const dev = devVal();
     $("#pvName").textContent = nameI.value.trim() || "Your coin";
     $("#pvSym").textContent = "$" + (symI.value.trim() || "TICKER");
@@ -380,7 +381,7 @@ $("#mineList").addEventListener("click", (e) => {
     $("#sTotal").textContent = `${fmt(preFee + dev + 0.03)} SOL`;
     $("#sEarn").textContent = `${fmt((10 - f.pre) * m.floor * (1 - PROTOCOL_FEE))}+ SOL to you`;
     $$<HTMLButtonElement>("#devQuick button").forEach((b) => b.classList.toggle("on", parseFloat(b.dataset.v!) === dev || (b.dataset.v === "0" && !dev && devI.value === "")));
-    miniStack($("#pvStack"), f.pre, true);
+    miniStack($("#pvStack"), document.documentElement.classList.contains("spots-on") ? f.pre : 0, true);
   }
   nameI.addEventListener("input", () => { nameI.classList.remove("bad"); render(); });
   symI.addEventListener("input", () => {
@@ -434,26 +435,28 @@ $("#mineList").addEventListener("click", (e) => {
       toast("Add " + miss.join(", ").replace(/, ([^,]*)$/, " and $1") + " first.");
       return;
     }
-    if (!isLive()) {
-      $("#help").textContent = "This is a preview build. Launching turns on once the site is connected to Solana (see the docs).";
-      toast("Preview build: launching is not switched on yet");
+    if (!canLaunch()) {
+      toast(window.StacksChain ? "Launching isn’t available on this build." : "Still loading, try again in a second.");
       return;
     }
+    const spots = isLive();
     if (!address && !(await connectWallet())) return;
     busy = true; btn.disabled = true; $("#doneBox").hidden = true;
     const sym = symI.value.trim();
-    const labels = [
-      "Uploading image and metadata",
-      `Creating $${sym} on pump.fun`,
-      "Registering the Spots and turning on fee sharing",
-      "Locking fees to the ten Spots and opening the auction",
-    ];
+    const labels = spots
+      ? [
+          "Uploading image and metadata",
+          `Creating $${sym} on pump.fun`,
+          "Registering the Spots and turning on fee sharing",
+          "Locking fees to the ten Spots and opening the auction",
+        ]
+      : ["Uploading image and metadata", devVal() > 0 ? `Creating $${sym} on pump.fun with your dev buy` : `Creating $${sym} on pump.fun`];
     const ol = $("#progress");
     ol.hidden = false;
     ol.innerHTML = labels.map((l) => `<li><i></i>${esc(l)}</li>`).join("");
     const items = $$("li", ol);
     const step = (i: number) => items.forEach((li, k) => { li.className = k < i ? "done" : k === i ? "run" : ""; });
-    $("#help").textContent = "Your wallet asks once, for every transaction.";
+    $("#help").textContent = spots ? "Your wallet asks once, for every transaction." : "Approve the transaction in your wallet.";
     try {
       const r = await window.StacksChain!.launch({
         venue: "pump", name: nameI.value.trim(), symbol: sym, image: f.img!,
@@ -464,9 +467,10 @@ $("#mineList").addEventListener("click", (e) => {
       step(items.length);
       const box = $("#doneBox");
       box.hidden = false;
-      box.innerHTML = `<b>$${esc(sym)} is live.</b> ${10 - f.pre} Spots are up for auction. <a href="${esc(r.explorer)}" target="_blank" rel="noopener">View transaction</a> · <a href="https://pump.fun/coin/${esc(r.mint)}" target="_blank" rel="noopener">Open on pump.fun</a><br><span class="mono" style="text-transform:none">${esc(r.mint)}</span>`;
+      const what = spots ? `${10 - f.pre} Spots are up for auction.` : "It’s trading on pump.fun now, and its creator fees go to your wallet.";
+      box.innerHTML = `<b>$${esc(sym)} is live.</b> ${what} <a href="${esc(r.explorer)}" target="_blank" rel="noopener">View transaction</a> · <a href="https://pump.fun/coin/${esc(r.mint)}" target="_blank" rel="noopener">Open on pump.fun</a><br><span class="mono" style="text-transform:none">${esc(r.mint)}</span>`;
       toast("Launched");
-      hero?.setSold(f.pre, false);
+      if (spots) hero?.setSold(f.pre, false);
     } catch (err) {
       items.forEach((li) => { if (li.className === "run") li.className = ""; });
       $("#help").innerHTML = `<span class="err">${esc(friendly(err))}</span>`;
@@ -496,7 +500,8 @@ window.StacksUI = {
 };
 
 function onChainReady() {
-  if (!isLive()) return;
+  if (!isLive()) { $("#launchBtn").removeAttribute("title"); return; }
+  document.documentElement.classList.add("spots-on");
   document.documentElement.classList.add("is-live");
   const net = window.StacksChain!.cluster === "mainnet-beta" ? "Solana" : "Solana devnet";
   $("#netName").textContent = net;

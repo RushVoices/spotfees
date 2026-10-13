@@ -94,13 +94,8 @@ async function sharesAndOpenTx(creator: PublicKey, mint: PublicKey, currentShare
   ]);
 }
 
-export async function launchOnPump(
-  conn: Connection,
-  creator: PublicKey,
-  p: LaunchParams,
-  onStep?: (i: number) => void,
-): Promise<{ mint: PublicKey; signatures: string[] }> {
-  const mint = Keypair.generate();
+/** The create (+ dev buy) transaction(s) for a new coin. Tx 0 needs the mint keypair's signature. */
+async function createTxs(conn: Connection, creator: PublicKey, mint: Keypair, p: Pick<LaunchParams, "name" | "symbol" | "uri" | "devBuyLamports">) {
   const online = new OnlinePumpSdk(conn);
   const [global, feeConfig] = await Promise.all([online.fetchGlobal(), online.fetchFeeConfig().catch(() => null)]);
 
@@ -120,15 +115,42 @@ export async function launchOnPump(
   // Two signers (wallet + mint). Prefer one transaction with a compute
   // budget, then one without; a very long name/URI falls back to create,
   // then buy, in back-to-back transactions.
-  let createTxs: Transaction[];
-  if (fitsLegacyTx([cu(350_000), ...ixs], creator, 2)) createTxs = [txOf([cu(350_000), ...ixs])];
-  else if (fitsLegacyTx(ixs, creator, 2)) createTxs = [txOf(ixs)];
-  else createTxs = [txOf(ixs.slice(0, 1)), txOf([cu(250_000), ...ixs.slice(1)])];
+  if (fitsLegacyTx([cu(350_000), ...ixs], creator, 2)) return [txOf([cu(350_000), ...ixs])];
+  if (fitsLegacyTx(ixs, creator, 2)) return [txOf(ixs)];
+  return [txOf(ixs.slice(0, 1)), txOf([cu(250_000), ...ixs.slice(1)])];
+}
 
+export async function launchOnPump(
+  conn: Connection,
+  creator: PublicKey,
+  p: LaunchParams,
+  onStep?: (i: number) => void,
+): Promise<{ mint: PublicKey; signatures: string[] }> {
+  const mint = Keypair.generate();
+  const create = await createTxs(conn, creator, mint, p);
   const [tx2, tx3] = await setupTxs(creator, mint.publicKey, p);
-  const extra = createTxs.length - 1; // report progress as the usual 3 steps
-  const signatures = await signAndSendSequential(conn, [...createTxs, tx2, tx3], [[mint]], (i) => {
+  const extra = create.length - 1; // report progress as the usual 3 steps
+  const signatures = await signAndSendSequential(conn, [...create, tx2, tx3], [[mint]], (i) => {
     if (i >= extra) onStep?.(i - extra);
+  });
+  return { mint: mint.publicKey, signatures };
+}
+
+/**
+ * A plain pump.fun launch (create + optional dev buy), for when the Spot
+ * program isn't live yet. The creator keeps the creator fees; the coin can
+ * be switched to Spots later with `finishPumpSetup`, from the same wallet.
+ */
+export async function launchPumpDirect(
+  conn: Connection,
+  creator: PublicKey,
+  p: Pick<LaunchParams, "name" | "symbol" | "uri" | "devBuyLamports">,
+  onStep?: (i: number) => void,
+): Promise<{ mint: PublicKey; signatures: string[] }> {
+  const mint = Keypair.generate();
+  const create = await createTxs(conn, creator, mint, p);
+  const signatures = await signAndSendSequential(conn, create, [[mint]], (i) => {
+    if (i === create.length - 1) onStep?.(0);
   });
   return { mint: mint.publicKey, signatures };
 }

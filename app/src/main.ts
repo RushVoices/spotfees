@@ -13,12 +13,12 @@ import { connectWallet, signAndSendSequential, walletKey } from "./chain/wallet"
 import {
   Mode, Status, Venue, fetchAllLaunches, fetchClaimable, ixClaim, ixTakeStack, ixTransferStack, priceAt, type LaunchState,
 } from "./chain/stacks";
-import { launchOnPump, finishPumpSetup, collectPumpFees } from "./chain/pump";
+import { launchOnPump, launchPumpDirect, finishPumpSetup, collectPumpFees } from "./chain/pump";
 import { launchOnMeteora, harvestMeteoraFees } from "./chain/meteora";
 import { uploadMetadata } from "./chain/ipfs";
 import { Transaction } from "@solana/web3.js";
 
-const conn = isLive() ? new Connection(env.rpcUrl, "confirmed") : null;
+const conn: Connection | null = new Connection(env.rpcUrl, "confirmed");
 const need = () => { if (!conn) throw new Error("This site is not connected to Solana yet."); return conn; };
 const sol = (l: bigint) => Number(l) / LAMPORTS_PER_SOL;
 
@@ -148,7 +148,10 @@ async function refreshMine() {
 // ---- actions -------------------------------------------------------------------
 
 const api = {
+  /** Spot program live: auctions, My Spots, fee splits. */
   live: isLive(),
+  /** Coins can be launched on pump.fun (always; Spots only when `live`). */
+  canLaunch: true,
   cluster: env.cluster,
 
   async connect(): Promise<string> {
@@ -173,11 +176,14 @@ const api = {
       prebuy: p.prebuy,
       devBuyLamports: BigInt(Math.round(p.devBuySol * LAMPORTS_PER_SOL)),
     };
-    const result = p.venue === "pump"
-      ? await launchOnPump(c, me, params, (i) => onStep(i + 1))
-      : await launchOnMeteora(c, me, params, (i) => onStep(i + 1));
-    refresh().catch(() => {});
-    return { mint: result.mint.toBase58(), signatures: result.signatures, explorer: explorer(result.signatures.at(-1)!) };
+    const spots = isLive();
+    const result = !spots
+      ? await launchPumpDirect(c, me, params, (i) => onStep(i + 1))
+      : p.venue === "pump"
+        ? await launchOnPump(c, me, params, (i) => onStep(i + 1))
+        : await launchOnMeteora(c, me, params, (i) => onStep(i + 1));
+    if (spots) refresh().catch(() => {});
+    return { mint: result.mint.toBase58(), signatures: result.signatures, explorer: explorer(result.signatures.at(-1)!), spots };
   },
 
   async finishSetup(mint: string, mode: "degen" | "builder", prebuy: number) {
