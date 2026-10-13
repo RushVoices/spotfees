@@ -85,22 +85,21 @@ let hero: StackHandle | null = null;
 })();
 
 /* =============================== TICKER =============================== */
-const SAMPLE = [
-  { name: "Gigachad Cat", sym: "GIGA", mode: "degen" as ModeKey, sold: 7, hue: "#d9f7e8", story: "The cat that never skips leg day. Ten Spots for the ten loudest believers in the timeline." },
-  { name: "Moon Committee", sym: "MOONC", mode: "builder" as ModeKey, sold: 3, hue: "#e8f6c9", story: "A DAO that votes on one thing: when moon. Spot holders fund the memes and share the fees." },
-  { name: "Tiny Frog Club", sym: "TFC", mode: "degen" as ModeKey, sold: 9, hue: "#cdf3e2", story: "Small frog, big pond. A members-only club where the ten Spot holders run the vibes." },
-  { name: "Solar Punks", sym: "SOLP", mode: "builder" as ModeKey, sold: 1, hue: "#e2f3ea", story: "Building a sunlit future on Solana. Fees from every trade go to the ten people building it." },
-  { name: "Dog With Hat", sym: "HAT", mode: "degen" as ModeKey, sold: 10, hue: "#f0f7d8", story: "He kept the hat. All ten Spots sold in four minutes." },
-  { name: "Long Bread", sym: "LOAF", mode: "degen" as ModeKey, sold: 4, hue: "#d6f0ff", story: "The longest loaf on-chain. Every trade adds a slice to the ten Spot vaults." },
+
+const FACTS = [
+  "<b>10</b> Spots per coin", "<b>10%</b> of creator fees, each", "Paid in <b>SOL</b>",
+  "Price drops every <b>15s</b>", "Launch in <b>one</b> wallet prompt", "Built on <b>pump.fun</b>",
 ];
 function renderTicker(items: { sym: string; sold: number; mode: ModeKey }[]) {
-  const one = items.map((l, i) => {
+  const one = !items.length
+    ? FACTS.map((f) => `<span class="tick"><span class="sep"></span>${f}</span>`).join("")
+    : items.map((l, i) => {
     const px = priceAt(l.mode, ((i * 37) % 8) * STEP_MS);
     return `<span class="tick"><span class="sep"></span><b>$${esc(l.sym)}</b> Spot <span class="it">${pad(Math.max(1, Math.min(10, l.sold)))}</span> taken at <b>${fmt(px)} SOL</b></span>`;
   }).join("");
   $("#ticker").innerHTML = one + one;
 }
-renderTicker(SAMPLE);
+renderTicker([]);
 
 /* =============================== AUCTION CHART =============================== */
 (function auctionChart() {
@@ -194,9 +193,7 @@ interface Launch {
   hue: string;
   t0: number;
 }
-let launches: Launch[] = SAMPLE.map((s, i) => ({
-  ...s, id: i, live: false, nextIndex: s.sold, t0: performance.now() - ((i * 41_000) % 110_000),
-}));
+let launches: Launch[] = [];
 let tab: "all" | "open" | "soldout" = "all";
 const isSold = (l: Launch) => l.sold >= 10 || l.status === "soldout";
 
@@ -230,7 +227,12 @@ function cardHTML(l: Launch) {
 }
 function renderGrid() {
   const list = launches.filter((l) => tab === "all" || (tab === "open" ? !isSold(l) : isSold(l)));
-  $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty">Nothing here yet.</div>`;
+  const empty = {
+    all: `<div class="empty"><b>No coins yet.</b><br>Be the first to launch one and put its ten Spots up for auction.<br><br><a class="btn primary sm" href="#launch">Launch a coin <span class="arr">→</span></a></div>`,
+    open: `<div class="empty"><b>No open auctions right now.</b><br>New coins show up here the moment their Spots go on sale.</div>`,
+    soldout: `<div class="empty"><b>Nothing has sold out yet.</b><br>Coins move here once all ten Spots are taken.</div>`,
+  }[tab];
+  $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : empty;
   $$<HTMLElement>("#grid .lc").forEach((c) => {
     const l = launches[+c.dataset.id!];
     miniStack($("[data-ms]", c), Math.min(10, l.sold), !isSold(l));
