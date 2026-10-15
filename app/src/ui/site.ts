@@ -475,6 +475,28 @@ $("#mineList").addEventListener("click", (e) => {
       items.forEach((li) => { if (li.className === "run") li.className = ""; });
       $("#help").innerHTML = `<span class="err">${esc(friendly(err))}</span>`;
       toast(friendly(err));
+      // The coin was created but its Spots weren't set up: offer to finish.
+      const mint = (err as { unfinishedMint?: string })?.unfinishedMint;
+      if (spots && mint) {
+        const { mode, pre } = f;
+        $("#help").insertAdjacentHTML("beforeend", ` <span>$${esc(sym)} was created; its Spots aren’t set up yet.</span> <button class="btn sm primary" type="button" id="finishBtn">Finish setup</button>`);
+        const fb = $<HTMLButtonElement>("#finishBtn");
+        fb.addEventListener("click", async () => {
+          fb.disabled = true;
+          try {
+            await window.StacksChain!.finishSetup(mint, mode, pre);
+            step(items.length);
+            $("#help").textContent = "";
+            const box = $("#doneBox");
+            box.hidden = false;
+            box.innerHTML = `<b>$${esc(sym)} is live.</b> ${10 - pre} Spots are up for auction. <a href="https://pump.fun/coin/${esc(mint)}" target="_blank" rel="noopener">Open on pump.fun</a><br><span class="mono" style="text-transform:none">${esc(mint)}</span>`;
+            toast("Spots are set up");
+          } catch (e) {
+            fb.disabled = false;
+            toast(friendly(e));
+          }
+        });
+      }
     } finally { busy = false; btn.disabled = false; }
   });
   render();

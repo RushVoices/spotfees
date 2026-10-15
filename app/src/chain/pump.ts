@@ -130,10 +130,19 @@ export async function launchOnPump(
   const create = await createTxs(conn, creator, mint, p);
   const [tx2, tx3] = await setupTxs(creator, mint.publicKey, p);
   const extra = create.length - 1; // report progress as the usual 3 steps
-  const signatures = await signAndSendSequential(conn, [...create, tx2, tx3], [[mint]], (i) => {
-    if (i >= extra) onStep?.(i - extra);
-  });
-  return { mint: mint.publicKey, signatures };
+  let created = false;
+  try {
+    const signatures = await signAndSendSequential(conn, [...create, tx2, tx3], [[mint]], (i) => {
+      created = true;
+      if (i >= extra) onStep?.(i - extra);
+    });
+    return { mint: mint.publicKey, signatures };
+  } catch (err) {
+    // The coin exists but its Spots aren't set up: tell the caller which coin,
+    // so it can offer finishPumpSetup.
+    if (created) throw Object.assign(err instanceof Error ? err : new Error(String(err)), { unfinishedMint: mint.publicKey.toBase58() });
+    throw err;
+  }
 }
 
 /**

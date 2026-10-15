@@ -7,8 +7,15 @@
 
 export const config = { runtime: "edge" };
 
+// publicnode refuses getProgramAccounts (the market list) without a key, so
+// that call falls through to the next upstream.
 const UPSTREAMS = () =>
-  [process.env.RPC_URL, "https://solana-rpc.publicnode.com", "https://api.mainnet-beta.solana.com"].filter(Boolean) as string[];
+  [
+    process.env.RPC_URL,
+    "https://solana-rpc.publicnode.com",
+    "https://public.rpc.solanavibestation.com",
+    "https://api.mainnet-beta.solana.com",
+  ].filter(Boolean) as string[];
 
 // Only what the site uses, so the route can't be used as a general free RPC.
 const ALLOWED = new Set([
@@ -35,8 +42,10 @@ export default async function handler(req: Request): Promise<Response> {
   for (const url of UPSTREAMS()) {
     try {
       const res = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: text });
-      // Fall through to the next upstream when this one refuses or is overloaded.
-      if (res.status === 403 || res.status === 429 || res.status >= 500) { last = res; continue; }
+      // Fall through to the next upstream when this one refuses, needs a key,
+      // or is overloaded. JSON-RPC errors (e.g. a failed simulation) come
+      // back as 200 and are returned as is.
+      if (!res.ok) { last = res; continue; }
       return new Response(await res.text(), { status: res.status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
     } catch {
       continue;
