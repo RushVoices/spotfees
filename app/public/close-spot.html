@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Close Spot</title>
+<link rel="icon" href="/favicon.svg">
+<style>
+  :root { --ink: #06120d; --ink-2: #33433b; --mute: #6f8379; --g-50: #effcf5; --g-200: #b0eed0; --g-500: #12c27a; --g-700: #087f50; --danger: #b42318; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: #fff; color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; display: grid; place-items: center; padding: 24px 16px; }
+  main { width: 100%; max-width: 560px; border: 1px solid #dfe8e2; border-radius: 22px; padding: 28px; box-shadow: 0 24px 50px -28px rgba(6, 60, 38, .35); }
+  h1 { margin: 0 0 6px; font-size: 26px; letter-spacing: -.02em; }
+  p { margin: 0 0 14px; color: var(--ink-2); }
+  dl { margin: 18px 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 14px; }
+  dt { color: var(--mute); }
+  dd { margin: 0; font-family: ui-monospace, monospace; word-break: break-all; }
+  button { width: 100%; height: 50px; border: 0; border-radius: 999px; font: 600 16px system-ui, sans-serif; cursor: pointer; background: var(--ink); color: #fff; margin-top: 8px; }
+  button.go { background: var(--danger); }
+  button:disabled { opacity: .45; cursor: default; }
+  .warn { background: #fff4f2; border: 1px solid #f6d4cc; border-radius: 14px; padding: 12px 14px; font-size: 14px; color: #7a2a1b; }
+  #msg { margin-top: 16px; font-size: 15px; min-height: 1.5em; }
+  #msg.err { color: var(--danger); }
+  #msg.ok { color: var(--g-700); font-weight: 600; }
+  a { color: var(--g-700); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Close the Spot program</h1>
+  <p>This shuts the Spot program down for good and sends its storage deposit to the wallet that controls it.</p>
+  <div class="warn">This can’t be undone. Spots on coins already launched through Spot can never be claimed again, and Spot can’t be reopened at this address.</div>
+  <dl>
+    <dt>Program</dt><dd id="prog"></dd>
+    <dt>Controlled by</dt><dd id="auth">checking…</dd>
+    <dt>Deposit</dt><dd id="dep">checking…</dd>
+  </dl>
+  <button id="connect" type="button">Connect Phantom</button>
+  <button id="close" class="go" type="button" disabled>Close and send me the SOL</button>
+  <div id="msg"></div>
+</main>
+<script src="https://unpkg.com/@solana/web3.js@1.98.0/lib/index.iife.min.js"></script>
+<script>
+  const { Connection, PublicKey, Transaction, TransactionInstruction } = solanaWeb3;
+  const PROGRAM = new PublicKey("4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx");
+  const LOADER = new PublicKey("BPFLoaderUpgradeab1e11111111111111111111111");
+  const [DATA] = PublicKey.findProgramAddressSync([PROGRAM.toBytes()], LOADER);
+  const conn = new Connection(location.origin + "/api/rpc", "confirmed");
+  const $ = (id) => document.getElementById(id);
+  const say = (t, cls = "") => { $("msg").textContent = t; $("msg").className = cls; };
+  let authority = null, wallet = null, me = null;
+
+  $("prog").textContent = PROGRAM.toBase58();
+
+  async function load() {
+    const info = await conn.getAccountInfo(DATA);
+    if (!info) { $("auth").textContent = "—"; $("dep").textContent = "0 SOL"; say("The program is already closed.", "ok"); $("connect").disabled = true; return; }
+    // ProgramData: u32 tag, u64 slot, Option<Pubkey> upgrade authority.
+    authority = info.data[12] === 1 ? new PublicKey(info.data.slice(13, 45)) : null;
+    $("auth").textContent = authority ? authority.toBase58() : "nobody (can’t be closed)";
+    $("dep").textContent = (info.lamports / 1e9).toFixed(4) + " SOL";
+  }
+  load().catch((e) => say("Couldn’t reach Solana: " + e.message, "err"));
+
+  $("connect").onclick = async () => {
+    try {
+      wallet = window.phantom?.solana ?? window.solana;
+      if (!wallet) return say("Phantom isn’t installed in this browser.", "err");
+      const r = await wallet.connect();
+      me = new PublicKey((r?.publicKey ?? wallet.publicKey).toString());
+      $("connect").textContent = "Connected: " + me.toBase58().slice(0, 4) + "…" + me.toBase58().slice(-4);
+      if (!authority || !me.equals(authority)) return say("This wallet doesn’t control the program. Switch Phantom to " + (authority ? authority.toBase58() : "the controlling wallet") + ".", "err");
+      $("close").disabled = false;
+      say("Ready. Phantom will ask you to approve one transaction.");
+    } catch (e) { say(e.message || String(e), "err"); }
+  };
+
+  $("close").onclick = async () => {
+    $("close").disabled = true;
+    try {
+      const ix = new TransactionInstruction({
+        programId: LOADER,
+        keys: [
+          { pubkey: DATA, isSigner: false, isWritable: true },  // account being closed
+          { pubkey: me, isSigner: false, isWritable: true },    // receives the deposit
+          { pubkey: me, isSigner: true, isWritable: false },    // upgrade authority
+          { pubkey: PROGRAM, isSigner: false, isWritable: true },
+        ],
+        data: new Uint8Array([5, 0, 0, 0]), // UpgradeableLoaderInstruction::Close
+      });
+      const tx = new Transaction().add(ix);
+      tx.feePayer = me;
+      // Finalized: every RPC (Phantom's included) knows it, so preflight never says "Blockhash not found".
+      tx.recentBlockhash = (await conn.getLatestBlockhash("finalized")).blockhash;
+      say("Approve the transaction in Phantom…");
+      const { signature } = await wallet.signAndSendTransaction(tx);
+      say("Sent. Waiting for confirmation…");
+      for (let i = 0; i < 60; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const { value: [st] } = await conn.getSignatureStatuses([signature]);
+        if (st?.err) throw new Error("The transaction failed: " + JSON.stringify(st.err));
+        if (st && (st.confirmationStatus === "confirmed" || st.confirmationStatus === "finalized")) {
+          $("msg").innerHTML = 'Done. The deposit is in your wallet. <a target="_blank" rel="noopener" href="https://solscan.io/tx/' + signature + '">View transaction</a>';
+          $("msg").className = "ok";
+          $("dep").textContent = "0 SOL";
+          return;
+        }
+      }
+      $("msg").innerHTML = 'Still confirming. Check <a target="_blank" rel="noopener" href="https://solscan.io/tx/' + signature + '">the transaction</a> in a minute.';
+    } catch (e) { $("close").disabled = false; say(e.message || String(e), "err"); }
+  };
+</script>
+</body>
+</html>

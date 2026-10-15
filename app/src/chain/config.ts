@@ -12,5 +12,9 @@ export const env = {
   treasury: import.meta.env.VITE_TREASURY || "",
 };
 
-/** True when the Spot program is deployed and configured: auctions, My Spots, fee splits. */
-export const isLive = () => !!(import.meta.env.VITE_STACKS_PROGRAM_ID && env.treasury);
+/**
+ * True when the Spot program is deployed and configured: auctions, My Spots, fee splits.
+ * Off: the mainnet program 4nzrub… is being closed (see public/close-spot.html), so the
+ * site launches plain pump.fun coins only.
+ */
+export const isLive = () => false;
