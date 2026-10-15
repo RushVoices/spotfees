@@ -29,7 +29,7 @@ use anchor_lang::solana_program::{
 use anchor_lang::system_program;
 use anchor_spl::token::{self, CloseAccount, Token, TokenAccount};
 
-declare_id!("3jFsMVZrjS6GVwQxh6wQGb71ubnBip6EBFxo9mydt3t3");
+declare_id!("4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx");
 
 pub const NUM_STACKS: usize = 10;
 pub const MAX_PREBUY: u8 = 5;

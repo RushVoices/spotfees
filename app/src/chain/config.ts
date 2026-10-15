@@ -7,7 +7,7 @@ export const env = {
   // Default: the site's own /api/rpc route, which forwards to Solana
   // server-side (public RPCs refuse direct browser requests).
   rpcUrl: import.meta.env.VITE_RPC_URL || (typeof location !== "undefined" ? `${location.origin}/api/rpc` : "https://api.mainnet-beta.solana.com"),
-  programId: import.meta.env.VITE_STACKS_PROGRAM_ID || "3jFsMVZrjS6GVwQxh6wQGb71ubnBip6EBFxo9mydt3t3",
+  programId: import.meta.env.VITE_STACKS_PROGRAM_ID || "4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx",
   meteoraConfig: import.meta.env.VITE_METEORA_CONFIG || "",
   treasury: import.meta.env.VITE_TREASURY || "",
 };

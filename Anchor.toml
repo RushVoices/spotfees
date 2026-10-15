@@ -6,13 +6,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-stacks = "3jFsMVZrjS6GVwQxh6wQGb71ubnBip6EBFxo9mydt3t3"
+stacks = "4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx"
 
 [programs.devnet]
-stacks = "3jFsMVZrjS6GVwQxh6wQGb71ubnBip6EBFxo9mydt3t3"
+stacks = "4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx"
 
 [programs.mainnet]
-stacks = "3jFsMVZrjS6GVwQxh6wQGb71ubnBip6EBFxo9mydt3t3"
+stacks = "4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx"
 
 [provider]
 cluster = "devnet"

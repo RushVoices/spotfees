@@ -5,7 +5,7 @@
 import { PublicKey, SystemProgram, Transaction, TransactionInstruction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { connection, loadKeypair, arg } from "./common";
 
-const PROGRAM_ID = new PublicKey(arg("program-id", "3jFsMVZrjS6GVwQxh6wQGb71ubnBip6EBFxo9mydt3t3"));
+const PROGRAM_ID = new PublicKey(arg("program-id", "4nzrubZcHBT2QDPKvFyDKjR5srt94JKhs2eFZ9RhV2Gx"));
 const admin = loadKeypair();
 const treasury = new PublicKey(arg("treasury"));
 const meteoraConfig = new PublicKey(arg("meteora-config", PublicKey.default.toBase58()));
